@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import { useRef } from 'react';
 import { ClothingNav } from '@/components/clothing/ClothingNav';
 import { CubeOrbit } from '@/components/clothing/CubeOrbit';
 import { ScrollProductSpotlight } from '@/components/clothing/ScrollProductSpotlight';
@@ -20,6 +21,7 @@ const GRID_PRODUCTS = CLOTHING_PRODUCTS;
 export default function Home() {
   const shouldReduce = useReducedMotion();
   const { toggleCart } = useCartStore();
+  const gridRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -39,7 +41,7 @@ export default function Home() {
           className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden"
         >
           {/* Background cubie constellation */}
-          <CubeOrbit />
+          <CubeOrbit gridRef={gridRef} />
 
           {/* Hero text */}
           <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
@@ -178,7 +180,7 @@ export default function Home() {
             3×3 ASSEMBLING GRID MOMENT
         ════════════════════════════════════════ */}
         <section className="w-full bg-white">
-          <AssemblingCubeGrid products={CLOTHING_PRODUCTS} />
+          <AssemblingCubeGrid products={CLOTHING_PRODUCTS} gridRef={gridRef} />
         </section>
 
         {/* ════════════════════════════════════════

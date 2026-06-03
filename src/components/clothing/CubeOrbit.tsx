@@ -1,7 +1,8 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { FloatingCube } from './FloatingCube';
+import { useEffect, useState } from 'react';
 
 const ORBIT_CUBES = [
   { color: '#D00000', size: 56, x: '8%',  y: '18%', delay: 0 },
@@ -16,39 +17,111 @@ const ORBIT_CUBES = [
 ];
 
 interface CubeOrbitProps {
-  /** 0–1: when 1, cubes fade and scale away to "assemble" later */
-  exitProgress?: number;
+  gridRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function CubeOrbit({ exitProgress = 0 }: CubeOrbitProps) {
+export function CubeOrbit({ gridRef }: CubeOrbitProps) {
+  const { scrollYProgress } = useScroll({
+    target: gridRef,
+    offset: ["start end", "end start"]
+  });
   const shouldReduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const [assembled, setAssembled] = useState(false);
+  const [bounds, setBounds] = useState<Array<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    endScale: number;
+  }>>([]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const calcBounds = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const mobile = width < 768;
+      const sp = mobile ? 78 : 98;
+      const cellSz = mobile ? 56 : 76;
+
+      const newBounds = ORBIT_CUBES.map((cube, i) => {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+
+        const startX = (parseFloat(cube.x) / 100) * width;
+        const startY = (parseFloat(cube.y) / 100) * height;
+
+        // Grid coordinates centered on screen
+        const endX = width / 2 + (col - 1) * sp - (cube.size / 2);
+        const endY = height / 2 + (row - 1) * sp - (cube.size / 2);
+        const endScale = cellSz / cube.size;
+
+        return {
+          startX,
+          startY,
+          endX,
+          endY,
+          endScale,
+        };
+      });
+      setBounds(newBounds);
+    };
+
+    calcBounds();
+    window.addEventListener('resize', calcBounds);
+    return () => window.removeEventListener('resize', calcBounds);
+  }, [mounted]);
+
+  // Track scroll position to disable idle drift when assembling
+  useEffect(() => {
+    return scrollYProgress.onChange((latest) => {
+      setAssembled(latest > 0.4);
+    });
+  }, [scrollYProgress]);
+
+  if (!mounted || bounds.length === 0) return null;
 
   return (
-    <div
-      className="absolute inset-0 pointer-events-none overflow-hidden"
-      aria-hidden="true"
-    >
-      {ORBIT_CUBES.map((cube, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          style={{
-            left: cube.x,
-            top: cube.y,
-            opacity: 1 - exitProgress * 0.85,
-            scale: 1 - exitProgress * 0.3,
-          }}
-          initial={shouldReduce ? {} : { opacity: 0, scale: 0.4 }}
-          animate={shouldReduce ? {} : { opacity: 1 - exitProgress * 0.85, scale: 1 - exitProgress * 0.3 }}
-          transition={{ delay: cube.delay, duration: 0.8, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
-        >
-          <FloatingCube
-            color={cube.color}
-            size={cube.size}
-            delay={cube.delay}
-          />
-        </motion.div>
-      ))}
+    <div className="fixed inset-0 pointer-events-none z-[49] overflow-hidden" aria-hidden="true">
+      {ORBIT_CUBES.map((cube, i) => {
+        const b = bounds[i];
+        if (!b) return null;
+
+        // Scroll mapping: from scattered to grid between scroll progress 0.0 and 0.48
+        const x = useTransform(scrollYProgress, [0, 0.48], [b.startX, b.endX]);
+        const y = useTransform(scrollYProgress, [0, 0.48], [b.startY, b.endY]);
+        const scale = useTransform(scrollYProgress, [0, 0.48], [1.0, b.endScale]);
+        const opacity = useTransform(scrollYProgress, [0.48, 0.52], [1, 0]);
+
+        return (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              left: 0,
+              top: 0,
+              x,
+              y,
+              width: cube.size,
+              height: cube.size,
+              opacity,
+              scale: shouldReduce ? 1.0 : scale,
+            }}
+          >
+            <FloatingCube
+              color={cube.color}
+              size={cube.size}
+              shouldDrift={!assembled}
+              delay={cube.delay}
+            />
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

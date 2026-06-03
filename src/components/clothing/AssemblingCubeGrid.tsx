@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ClothingProduct } from '@/data/clothingProducts';
 
 const GRID_COLORS = [
@@ -9,27 +9,25 @@ const GRID_COLORS = [
   '#0046AD', '#FFD500', '#009B48',
 ];
 
-const OFFSETS = [
-  { x: -50, y: -45 },
-  { x: 30, y: -60 },
-  { x: 80, y: -30 },
-  { x: -70, y: 10 },
-  { x: 10, y: -15 },
-  { x: 60, y: 25 },
-  { x: -40, y: 70 },
-  { x: 20, y: 55 },
-  { x: 80, y: 40 },
-];
-
 interface AssemblingCubeGridProps {
   products: ClothingProduct[];
+  gridRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function AssemblingCubeGrid({ products }: AssemblingCubeGridProps) {
+export function AssemblingCubeGrid({ products, gridRef }: AssemblingCubeGridProps) {
   const shouldReduce = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: gridRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Fade in the static cells exactly as the fixed blocks fade out
+  const cellOpacity = useTransform(scrollYProgress, [0.48, 0.52], [0, 1]);
 
   return (
     <motion.section
+      ref={gridRef}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: false, margin: '-10%' }}
@@ -56,32 +54,15 @@ export function AssemblingCubeGrid({ products }: AssemblingCubeGridProps) {
       <div className="cube-grid-3x3 w-[240px] md:w-[300px]">
         {GRID_COLORS.map((color, i) => {
           const product = products[i % products.length];
-          const offset = OFFSETS[i % OFFSETS.length];
           return (
             <motion.div
               key={i}
-              variants={{
-                hidden: {
-                  opacity: 0,
-                  scale: shouldReduce ? 1 : 0.3,
-                  x: shouldReduce ? 0 : offset.x,
-                  y: shouldReduce ? 0 : offset.y,
-                },
-                visible: {
-                  opacity: 1,
-                  scale: 1,
-                  x: 0,
-                  y: 0,
-                  transition: {
-                    delay: i * 0.06,
-                    duration: 0.6,
-                    ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
-                  },
-                },
-              }}
               whileHover={shouldReduce ? {} : { scale: 1.06 }}
               className="aspect-square rounded-[10px] flex items-center justify-center cursor-pointer"
-              style={{ background: '#1A1A1A' }}
+              style={{
+                background: '#1A1A1A',
+                opacity: shouldReduce ? 1.0 : cellOpacity,
+              }}
               title={product?.name}
             >
               <div

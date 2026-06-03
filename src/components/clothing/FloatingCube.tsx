@@ -15,6 +15,7 @@ interface FloatingCubeProps {
   className?: string;
   onClick?: () => void;
   label?: string;
+  shouldDrift?: boolean;
 }
 
 export function FloatingCube({
@@ -24,6 +25,7 @@ export function FloatingCube({
   className = '',
   onClick,
   label,
+  shouldDrift = true,
 }: Omit<FloatingCubeProps, 'targetX' | 'targetY' | 'assembleProgress'>) {
   const shouldReduce = useReducedMotion();
   const [mounted, setMounted] = useState(false);
@@ -37,7 +39,7 @@ export function FloatingCube({
   const stickerSize = Math.round(size * 0.78);
 
   // Idle drift animation — simple sine-like float
-  const driftAnim = shouldReduce ? {} : {
+  const driftAnim = (shouldReduce || !shouldDrift) ? {} : {
     y: [0, -10, 4, -8, 0],
     rotate: [0, 3, -2, 1, 0],
     transition: {
