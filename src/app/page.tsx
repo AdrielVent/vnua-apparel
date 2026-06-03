@@ -273,6 +273,7 @@ export default function Home() {
                   {['New Drop', 'Clothing', 'Lookbook', 'Size / Fit', 'About'].map((l) => (
                     <li key={l}><a href={`#${l.toLowerCase().replace(/\s\/?\s/g, '-')}`} className="font-mono text-xs text-gray-400 hover:text-white transition-colors tracking-wider">{l}</a></li>
                   ))}
+                  <li><a href="https://adrielvent.github.io/vnua-systems/#apparel" className="font-mono text-xs text-gray-400 hover:text-white transition-colors tracking-wider">Main Hub ↗</a></li>
                 </ul>
               </div>
               <div>

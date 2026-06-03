@@ -97,13 +97,13 @@ export function ClothingNav() {
         </motion.button>
 
         {/* Hub Access link */}
-        <Link
-          href="/"
+        <a
+          href="https://adrielvent.github.io/vnua-systems/#apparel"
           className="px-3 py-2 text-[11px] font-mono font-bold tracking-widest uppercase text-gray-400 hover:text-gray-700 transition-colors"
           title="VNUA Main Hub"
         >
           Hub ↗
-        </Link>
+        </a>
       </div>
     </motion.header>
   );
