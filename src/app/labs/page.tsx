@@ -15,7 +15,7 @@ export default function Labs() {
         [ DIRECTORY UNDER CONSTRUCTION. DATA SYNC IN PROGRESS. ]
       </div>
       <a
-        href="https://engineering.adrielv.me/"
+        href="https://adrielvent.github.io/adriel-portfolio/"
         target="_blank"
         rel="noopener noreferrer"
         className="mt-6 inline-flex items-center gap-2 border border-[#00F3FF]/40 bg-[#00F3FF]/5 px-5 py-3 font-mono text-xs uppercase tracking-widest text-[#00F3FF] transition-colors hover:border-[#00F3FF] hover:bg-[#00F3FF]/10"
