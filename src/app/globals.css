@@ -1,48 +1,195 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────
+   VNUA CLOTHING — LIGHT THEME DESIGN TOKENS
+   Wii-channel premium clarity + puzzle-cube accents
+───────────────────────────────────────────────── */
 :root {
-  --background: #0A0A0A;
-  --foreground: #FFFFFF;
-  --cyan: #00F3FF;
-  
-  /* Rubik's Palette */
-  --neon-green: #00E66B;
-  --kinetic-red: #FF003C;
-  --flare-orange: #FF6B00;
-  --cobalt-blue: #0066FF;
-  --circuit-gold: #FFD700;
-  --stark-white: #FFFFFF;
-  
-  /* Brutalist Grid System */
+  /* Core backgrounds */
+  --background:    #FFFFFF;
+  --bg-subtle:     #F6F6F6;
+  --bg-pattern:    #F3F3F3;
+  --surface:       #FFFFFF;
+  --surface-raised: #FAFAFA;
+
+  /* Typography */
+  --foreground:    #0A0A0A;
+  --ink-mid:       #444444;
+  --ink-light:     #999999;
+  --ink-xlight:    #CCCCCC;
+
+  /* Puzzle-cube accent palette — legally clean generic tones */
+  --cube-red:      #D00000;
+  --cube-blue:     #0046AD;
+  --cube-yellow:   #FFD500;
+  --cube-green:    #009B48;
+  --cube-orange:   #FF5800;
+  --cube-white:    #FFFFFF;
+  --cube-black:    #1A1A1A;  /* plastic body */
+
+  /* Legacy support (keep brutalist pages working) */
+  --cyan:          #00F3FF;
+  --neon-green:    #00E66B;
+  --kinetic-red:   #D00000;
+  --flare-orange:  #FF5800;
+  --cobalt-blue:   #0046AD;
+  --circuit-gold:  #FFD500;
+  --stark-white:   #FFFFFF;
+
+  /* Panel system */
+  --radius-sm:     10px;
+  --radius:        18px;
+  --radius-lg:     28px;
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.06);
+  --shadow:        0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg:     0 12px 48px rgba(0,0,0,0.10), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-xl:     0 24px 80px rgba(0,0,0,0.12);
+
+  /* Borders */
   --border-thick: 4px solid #000000;
-  --border-thin: 2px solid #000000;
+  --border-thin:  2px solid #000000;
+  --border-soft:  1px solid rgba(0,0,0,0.08);
 }
 
+/* ─── Tailwind 4 theme bridge ────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-cyan: var(--cyan);
-  --color-neon-green: var(--neon-green);
-  --color-kinetic-red: var(--kinetic-red);
-  --color-flare-orange: var(--flare-orange);
-  --color-cobalt-blue: var(--cobalt-blue);
-  --color-circuit-gold: var(--circuit-gold);
-  
+  --color-background:    var(--background);
+  --color-foreground:    var(--foreground);
+  --color-bg-subtle:     var(--bg-subtle);
+  --color-surface:       var(--surface);
+  --color-ink-mid:       var(--ink-mid);
+  --color-ink-light:     var(--ink-light);
+  --color-cube-red:      var(--cube-red);
+  --color-cube-blue:     var(--cube-blue);
+  --color-cube-yellow:   var(--cube-yellow);
+  --color-cube-green:    var(--cube-green);
+  --color-cube-orange:   var(--cube-orange);
+  --color-cube-white:    var(--cube-white);
+
+  /* Legacy colors for existing pages */
+  --color-cyan:          var(--cyan);
+  --color-neon-green:    var(--neon-green);
+  --color-kinetic-red:   var(--kinetic-red);
+  --color-flare-orange:  var(--flare-orange);
+  --color-cobalt-blue:   var(--cobalt-blue);
+  --color-circuit-gold:  var(--circuit-gold);
+
   --font-sans: var(--font-orbitron), sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
 }
+
+/* ─────────────────────────────────────────────────
+   BASE
+───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 3D Cube Flip Effect */
-.cube-container {
-  perspective: 1000px;
+/* ─────────────────────────────────────────────────
+   CLOTHING SITE LAYOUT
+───────────────────────────────────────────────── */
+
+/* Subtle vertical stripe pattern (very light) */
+.bg-stripe-pattern {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 39px,
+    rgba(0,0,0,0.03) 39px,
+    rgba(0,0,0,0.03) 40px
+  );
 }
 
+/* Soft panel card */
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-raised {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ─────────────────────────────────────────────────
+   FLOATING CUBE — The physical plastic cubie
+───────────────────────────────────────────────── */
+.cubie-body {
+  background: var(--cube-black);
+  border-radius: 14px;
+  box-shadow:
+    3px 5px 18px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cubie-sticker {
+  border-radius: 9px;
+  box-shadow:
+    inset 0 3px 6px rgba(0,0,0,0.18),
+    0 1px 0 rgba(255,255,255,0.25);
+}
+
+/* ─────────────────────────────────────────────────
+   SCROLL PRODUCT SPOTLIGHT
+───────────────────────────────────────────────── */
+.spotlight-image-frame {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ─────────────────────────────────────────────────
+   3×3 ASSEMBLING CUBE GRID
+───────────────────────────────────────────────── */
+.cube-grid-3x3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px;
+  background: var(--cube-black);
+  border-radius: 22px;
+  box-shadow: var(--shadow-xl);
+}
+
+/* ─────────────────────────────────────────────────
+   NAV PILL
+───────────────────────────────────────────────── */
+.nav-pill {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 100px;
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+}
+
+/* ─────────────────────────────────────────────────
+   LEGACY BRUTALIST UTILITIES (keep old pages working)
+───────────────────────────────────────────────── */
+.brutal-border   { border: var(--border-thick); }
+.brutal-border-b { border-bottom: var(--border-thick); }
+.brutal-border-r { border-right: var(--border-thick); }
+.brutal-border-l { border-left: var(--border-thick); }
+.brutal-border-t { border-top: var(--border-thick); }
+
+/* Legacy 3D cube flip */
+.cube-container { perspective: 1000px; }
 .cube {
   position: relative;
   width: 100%;
@@ -50,11 +197,7 @@ body {
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
-
-.cube-container:hover .cube {
-  transform: rotateY(180deg);
-}
-
+.cube-container:hover .cube { transform: rotateY(180deg); }
 .cube-face {
   position: absolute;
   width: 100%;
@@ -62,16 +205,8 @@ body {
   backface-visibility: hidden;
   border: var(--border-thick);
 }
-
-.cube-front {
-  transform: rotateY(0deg);
-  z-index: 2;
-}
-
-.cube-back {
-  transform: rotateY(180deg);
-  background: #000;
-}
+.cube-front { transform: rotateY(0deg); z-index: 2; }
+.cube-back  { transform: rotateY(180deg); background: #000; }
 
 /* Infinite Marquee */
 .marquee-container {
@@ -80,24 +215,19 @@ body {
   display: flex;
   width: 100%;
 }
-
 .marquee-content {
   display: flex;
   animation: marquee 15s linear infinite;
 }
-
 @keyframes marquee {
-  0% { transform: translateX(0%); }
+  0%   { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
 }
 
-/* Brutalist Utilities */
-.brutal-border {
-  border: var(--border-thick);
-}
-.brutal-border-b {
-  border-bottom: var(--border-thick);
-}
-.brutal-border-r {
-  border-right: var(--border-thick);
+/* ─────────────────────────────────────────────────
+   REDUCED MOTION — accessibility
+───────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-content { animation: none; }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
