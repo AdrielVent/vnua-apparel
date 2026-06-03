@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VNUA SYSTEMS — The creative-engineering identity of Adriel Ventura. Labs, Studio, Systems, Apparel." />
+  <meta name="theme-color" content="#060608" />
+  <title>VNUA SYSTEMS — Adriel Ventura</title>
+
+  <!-- Google Fonts: JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Three.js r169 via Cloudflare CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r169/three.min.js"></script>
+  <!-- GSAP 3.12.5 + ScrollTrigger via Cloudflare CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       VNUA SYSTEMS — DESIGN TOKEN SYSTEM
+       2026 Luminescent Aerospace HUD Palette
+    ═══════════════════════════════════════════════════════════ */
+    :root {
+      --bg:        #060608;
+      --cyan:      #00F0FF;
+      --orange:    #FF5900;   /* Division 01 — Labs & Hardware    */
+      --green:     #00E66B;   /* Division 02 — Systems & Code     */
+      --blue:      #0055FF;   /* Division 03 — Studio & Design    */
+      --red:       #FF003C;   /* Division 04 — Apparel & Protos   */
+      --white:     #FFFFFF;
+      --gold:      #FFD700;
+      --border:    rgba(0,240,255,0.15);
+      --border-xs: rgba(0,240,255,0.07);
+      --font:      'JetBrains Mono', monospace;
+      --hud-h:     56px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Scanline overlay — aesthetic CRT texture ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* ── Vignette ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+      pointer-events: none;
+      z-index: 9997;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CUSTOM CURSOR
+    ═══════════════════════════════════════════════════════════ */
+    #cursor {
+      position: fixed;
+      width: 7px; height: 7px;
+      background: var(--cyan);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10000;
+      box-shadow: 0 0 8px var(--cyan);
+      transition: transform 0.08s;
+    }
+    #cursor-ring {
+      position: fixed;
+      width: 30px; height: 30px;
+      border: 1px solid rgba(0,240,255,0.55);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       THREE.JS CANVAS — fixed backdrop, full viewport
+    ═══════════════════════════════════════════════════════════ */
+    #cube-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 1;
+      pointer-events: none; /* scroll events pass through */
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HUD HEADER
+    ═══════════════════════════════════════════════════════════ */
+    #hud-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--hud-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      background: rgba(6,6,8,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      z-index: 500;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      gap: 1rem;
+    }
+
+    .hud-logo {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--cyan);
+      text-decoration: none;
+      letter-spacing: 0.3em;
+      text-shadow: 0 0 20px rgba(0,240,255,0.4);
+      flex-shrink: 0;
+    }
+
+    .hud-sep {
+      width: 1px;
+      height: 26px;
+      background: var(--border);
+      margin: 0 1rem;
+      flex-shrink: 0;
+    }
+
+    .hud-left { display: flex; align-items: center; flex-shrink: 0; }
+    .hud-right { display: flex; align-items: center; flex-shrink: 0; }
+    .hud-center {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex: 1;
+      justify-content: center;
+      color: rgba(0,240,255,0.45);
+    }
+    .hud-center span { color: var(--cyan); }
+
+    .hud-identity { color: rgba(255,255,255,0.4); white-space: nowrap; }
+    .hud-identity span { color: rgba(255,255,255,0.85); }
+
+    .hud-nav { display: flex; gap: 1.5rem; }
+    .hud-nav a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .hud-nav a:hover { color: var(--cyan); }
+
+    .hud-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(0,240,255,0.5);
+      white-space: nowrap;
+      font-size: 9px;
+    }
+
+    /* Pulsing status dot */
+    .dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.35; transform: scale(0.65); }
+    }
+
+    #hud-time {
+      font-size: 11px;
+      color: rgba(0,240,255,0.75);
+      letter-spacing: 0.08em;
+      min-width: 72px;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SIDEBAR TELEMETRY PANELS
+    ═══════════════════════════════════════════════════════════ */
+    .sidebar-hud {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      padding: 1.1rem 0.85rem;
+      background: rgba(6,6,8,0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      width: 152px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .sidebar-hud.left {
+      left: 0;
+      border-left: none;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      border-left: 2px solid var(--cyan);
+    }
+    .sidebar-hud.right {
+      right: 0;
+      border-right: none;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+      border-right: 2px solid var(--cyan);
+    }
+    .sidebar-row { display: flex; flex-direction: column; gap: 3px; }
+    .sidebar-row .s-label { color: rgba(255,255,255,0.25); font-size: 8px; }
+    .sidebar-row .s-value { color: var(--cyan); font-size: 9px; font-weight: 500; }
+    .sidebar-row .s-value.nominal { color: var(--green); }
+    .sidebar-divider { height: 1px; background: var(--border-xs); }
+
+    /* ═══════════════════════════════════════════════════════════
+       SCROLLABLE CONTENT WRAPPER
+    ═══════════════════════════════════════════════════════════ */
+    #content {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--hud-h) + 2rem) 2rem 4rem;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Corner brackets */
+    .corner {
+      position: absolute;
+      width: 22px; height: 22px;
+      border-color: rgba(0,240,255,0.35);
+      border-style: solid;
+    }
+    .corner-tl { top: calc(var(--hud-h) + 12px); left: 18px; border-width: 1px 0 0 1px; }
+    .corner-tr { top: calc(var(--hud-h) + 12px); right: 18px; border-width: 1px 1px 0 0; }
+    .corner-bl { bottom: 18px; left: 18px;  border-width: 0 0 1px 1px; }
+    .corner-br { bottom: 18px; right: 18px; border-width: 0 1px 1px 0; }
+
+    /* Crosshair lines */
+    .crosshair { position: absolute; background: rgba(0,240,255,0.07); pointer-events: none; }
+    .crosshair-h { top: 50%; left: 0; right: 0; height: 1px; }
+    .crosshair-v { left: 50%; top: 0; bottom: 0; width: 1px; }
+
+    /* HUD readouts overlaid on cube */
+    .hud-readout {
+      position: absolute;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: rgba(0,240,255,0.45);
+      line-height: 1.9;
+      text-transform: uppercase;
+    }
+    .hud-readout span { color: var(--green); }
+    .hud-readout-tl { top: calc(var(--hud-h) + 44px); left: 44px; text-align: left; }
+    .hud-readout-tr { top: calc(var(--hud-h) + 44px); right: 44px; text-align: right; }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.45em;
+      color: rgba(0,240,255,0.65);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title {
+      font-size: clamp(3.8rem, 11vw, 9rem);
+      font-weight: 800;
+      line-height: 0.88;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+    .hero-title .accent {
+      color: var(--cyan);
+      text-shadow: 0 0 40px rgba(0,240,255,0.25);
+    }
+    .hero-sub {
+      font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+      letter-spacing: 0.28em;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      margin-bottom: 2.75rem;
+    }
+
+    /* Cube control buttons */
+    .cube-controls {
+      display: flex;
+      gap: 1rem;
+      position: relative;
+      z-index: 20;
+    }
+    .cube-btn {
+      font-family: var(--font);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: rgba(0,240,255,0.04);
+      border: 1px solid rgba(0,240,255,0.28);
+      padding: 0.65rem 1.5rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .cube-btn:hover {
+      background: rgba(0,240,255,0.1);
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(0,240,255,0.18), inset 0 0 18px rgba(0,240,255,0.04);
+    }
+    .cube-btn:active { transform: scale(0.97); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      color: rgba(255,255,255,0.18);
+      text-transform: uppercase;
+      animation: blink 2.4s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:0.2} 50%{opacity:0.7} }
+
+    /* ═══════════════════════════════════════════════════════════
+       CONTENT SECTIONS — shared styles
+    ═══════════════════════════════════════════════════════════ */
+    .section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 6rem 2rem;
+      position: relative;
+    }
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    /* Glass content panel */
+    .section-content {
+      background: rgba(6,6,8,0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Colored top accent bar */
+    .section-content::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 48px; height: 2px;
+    }
+    .section--labs    .section-content::before { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+    .section--systems .section-content::before { background: var(--green);  box-shadow: 0 0 12px var(--green); }
+    .section--studio  .section-content::before { background: var(--blue);   box-shadow: 0 0 12px var(--blue); }
+    .section--apparel .section-content::before { background: var(--red);    box-shadow: 0 0 12px var(--red); }
+
+    /* Division identifier tag */
+    .div-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .tag-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .tag-line { flex: 1; height: 1px; background: var(--border); }
+    .section--labs    .tag-dot { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+    .section--systems .tag-dot { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+    .section--studio  .tag-dot { background: var(--blue);   box-shadow: 0 0 6px var(--blue); }
+    .section--apparel .tag-dot { background: var(--red);    box-shadow: 0 0 6px var(--red); }
+
+    .section-heading {
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+    }
+    .word-accent { display: block; }
+    .section--labs    .word-accent { color: var(--orange); }
+    .section--systems .word-accent { color: var(--green); }
+    .section--studio  .word-accent { color: var(--blue); }
+    .section--apparel .word-accent { color: var(--red); }
+
+    .section-sub {
+      font-size: 0.68rem;
+      line-height: 2;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 2rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* Project cards grid */
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border-xs);
+      padding: 1.2rem;
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .card:hover {
+      border-color: rgba(0,240,255,0.22);
+      background: rgba(0,240,255,0.025);
+    }
+    .card-id    { font-size: 8px; letter-spacing: 0.2em; color: rgba(255,255,255,0.2); margin-bottom: 0.45rem; }
+    .card-title { font-size: 0.72rem; font-weight: 700; color: var(--white); margin-bottom: 0.45rem; letter-spacing: 0.04em; }
+    .card-desc  { font-size: 0.63rem; line-height: 1.75; color: rgba(255,255,255,0.32); margin-bottom: 0.7rem; }
+    .card-tag   { font-size: 8px; letter-spacing: 0.14em; padding: 0.22rem 0.55rem; display: inline-block; }
+    .section--labs    .card-tag { color: var(--orange); border: 1px solid rgba(255,89,0,0.3); }
+    .section--systems .card-tag { color: var(--green);  border: 1px solid rgba(0,230,107,0.3); }
+    .section--studio  .card-tag { color: var(--blue);   border: 1px solid rgba(0,85,255,0.3); }
+    .section--apparel .card-tag { color: var(--red);    border: 1px solid rgba(255,0,60,0.3); }
+
+    .labs-portfolio-link {
+      display: grid;
+      gap: 0.55rem;
+      min-width: 0;
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(255,89,0,0.32);
+      background: linear-gradient(90deg, rgba(255,89,0,0.1), rgba(255,89,0,0.02));
+      color: rgba(255,255,255,0.78);
+      text-decoration: none;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s;
+    }
+    .labs-portfolio-link:hover,
+    .labs-portfolio-link:focus-visible {
+      border-color: rgba(255,89,0,0.78);
+      background: linear-gradient(90deg, rgba(255,89,0,0.18), rgba(255,89,0,0.04));
+      transform: translateY(-2px);
+    }
+    .labs-portfolio-link__status,
+    .labs-portfolio-link__meta {
+      font-size: 8px;
+      letter-spacing: 0.16em;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+    .labs-portfolio-link__status { color: var(--orange); }
+    .labs-portfolio-link__meta { color: rgba(255,255,255,0.32); }
+    .labs-portfolio-link strong {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Visual column — transparent, lets cube show through */
+    .section-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      position: relative;
+    }
+    .geo-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(0,240,255,0.1);
+      animation: spin-ring 20s linear infinite;
+    }
+    @keyframes spin-ring { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════════════════════
+       ABOUT SECTION
+    ═══════════════════════════════════════════════════════════ */
+    #about {
+      min-height: 100vh;
+      padding: 6rem 2rem;
+      position: relative;
+    }
+    .about-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .about-label {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      color: rgba(0,240,255,0.5);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+    .about-title {
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+    .about-body {
+      font-size: 0.68rem;
+      line-height: 2.1;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.04em;
+    }
+    .about-body strong { color: var(--white); font-weight: 700; }
+    .about-body em     { color: var(--cyan); font-style: normal; }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .stat-block {
+      border: 1px solid var(--border);
+      padding: 1.3rem;
+      background: rgba(6,6,8,0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .stat-num {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--cyan);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 24px rgba(0,240,255,0.3);
+    }
+    .stat-label {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.28);
+      text-transform: uppercase;
+    }
+
+    /* System log terminal */
+    .sys-log {
+      background: rgba(0,240,255,0.025);
+      border: 1px solid var(--border);
+      padding: 1.1rem;
+    }
+    .sys-log-title {
+      color: rgba(0,240,255,0.45);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      margin-bottom: 0.75rem;
+    }
+    #sys-log-lines { max-height: 150px; overflow-y: auto; }
+    .sys-log-line  { font-size: 9px; line-height: 1.9; color: rgba(255,255,255,0.4); }
+    .sys-log-line .ok { color: var(--green); }
+    .sys-log-cursor {
+      display: inline-block;
+      width: 6px; height: 11px;
+      background: var(--cyan);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 0.85s step-end infinite;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════ */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      background: rgba(4,4,6,0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Infinite ticker marquee */
+    .ticker-wrap {
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 0;
+      background: rgba(0,240,255,0.025);
+    }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: rgba(0,240,255,0.45);
+      text-transform: uppercase;
+      animation: ticker-scroll 40s linear infinite;
+    }
+    @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .footer-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 3rem;
+      align-items: start;
+    }
+    .footer-logo    { font-size: 2.4rem; font-weight: 800; color: var(--cyan); letter-spacing: 0.22em; text-shadow: 0 0 24px rgba(0,240,255,0.3); }
+    .footer-tagline { font-size: 9px; letter-spacing: 0.15em; color: rgba(255,255,255,0.2); text-transform: uppercase; margin-top: 0.5rem; }
+    .footer-links   { display: flex; gap: 3rem; }
+    .footer-col h5  { font-size: 9px; letter-spacing: 0.22em; color: rgba(0,240,255,0.45); text-transform: uppercase; margin-bottom: 0.75rem; font-weight: 500; }
+    .footer-col a   { display: block; font-size: 9px; letter-spacing: 0.1em; color: rgba(255,255,255,0.28); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--cyan); }
+
+    /* Email sync terminal */
+    .footer-sync        { display: flex; flex-direction: column; gap: 0.5rem; }
+    .footer-sync label  { font-size: 9px; letter-spacing: 0.22em; color: rgba(0,240,255,0.45); text-transform: uppercase; }
+    .sync-input-wrap    { display: flex; border: 1px solid var(--border); }
+    .sync-input {
+      background: transparent; border: none;
+      padding: 0.65rem 0.8rem;
+      color: var(--white);
+      font-family: var(--font); font-size: 9px; letter-spacing: 0.1em;
+      flex: 1; outline: none; min-width: 0;
+    }
+    .sync-input::placeholder { color: rgba(255,255,255,0.18); }
+    .sync-btn {
+      background: rgba(0,240,255,0.06); border: none; border-left: 1px solid var(--border);
+      padding: 0.65rem 1rem; color: var(--cyan);
+      font-family: var(--font); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .sync-btn:hover { background: rgba(0,240,255,0.14); }
+    .sync-confirm   { font-size: 9px; color: var(--green); display: none; letter-spacing: 0.1em; }
+
+    .footer-bottom {
+      max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--border);
+      font-size: 8px; letter-spacing: 0.12em; color: rgba(255,255,255,0.18); text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       REVEAL ANIMATION (JS-driven via IntersectionObserver)
+    ═══════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE — MOBILE
+    ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .sidebar-hud  { display: none; }
+      .section-grid { grid-template-columns: 1fr !important; }
+      .section-visual { display: none; }
+      .cards-grid   { grid-template-columns: 1fr; }
+      .about-inner  { grid-template-columns: 1fr; gap: 3rem; }
+      .footer-top   { grid-template-columns: 1fr; }
+      .footer-links { flex-direction: column; gap: 1.5rem; }
+      .hud-center   { display: none; }
+      .hud-identity { display: none; }
+      .hud-readout  { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─────────────────────────────────────────────────────
+  CUSTOM CURSOR
+────────────────────────────────────────────────────── -->
+<div id="cursor"      aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<!-- ─────────────────────────────────────────────────────
+  THREE.JS CANVAS — fixed backdrop, full viewport
+────────────────────────────────────────────────────── -->
+<canvas id="cube-canvas" aria-hidden="true"></canvas>
+
+<!-- ─────────────────────────────────────────────────────
+  HUD HEADER
+────────────────────────────────────────────────────── -->
+<header id="hud-header" role="banner">
+  <div class="hud-left">
+    <a href="#hero" class="hud-logo" aria-label="VNUA Systems home">VNUA</a>
+    <div class="hud-sep" aria-hidden="true"></div>
+    <div class="hud-identity" aria-label="Identity">
+      Identity: <span>ADRIEL VENTURA</span> // Origin: <span>2018</span>
+    </div>
+  </div>
+
+  <div class="hud-center" aria-label="Coordinates">
+    <span>LAT:&nbsp;<span>40.7128° N</span></span>
+    <span>LON:&nbsp;<span>74.0060° W</span></span>
+  </div>
+
+  <div class="hud-right">
+    <nav class="hud-nav" aria-label="Main navigation">
+      <a href="#labs">LABS</a>
+      <a href="#systems">SYSTEMS</a>
+      <a href="#studio">STUDIO</a>
+      <a href="#apparel">APPAREL</a>
+      <a href="#about">ABOUT</a>
+    </nav>
+    <div class="hud-sep" aria-hidden="true"></div>
+    <div class="hud-status">
+      <div class="dot" aria-hidden="true"></div>
+      VNUA ARCHIVE // SECURE CONNECTION
+    </div>
+    <div class="hud-sep" aria-hidden="true"></div>
+    <span id="hud-time" aria-label="System time">00:00:00</span>
+  </div>
+</header>
+
+<!-- ─────────────────────────────────────────────────────
+  LEFT SIDEBAR TELEMETRY
+────────────────────────────────────────────────────── -->
+<aside class="sidebar-hud left" aria-label="System telemetry left">
+  <div class="sidebar-row">
+    <span class="s-label">System ID</span>
+    <span class="s-value">VNUA_SYS_MAIN</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-row">
+    <span class="s-label">Status</span>
+    <span class="s-value nominal">NOMINAL</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-row">
+    <span class="s-label">Lab</span>
+    <span class="s-value nominal">ACTIVE</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-row">
+    <span class="s-label">Renderer</span>
+    <span class="s-value">THREE.JS r169</span>
+  </div>
+</aside>
+
+<!-- ─────────────────────────────────────────────────────
+  RIGHT SIDEBAR TELEMETRY
+────────────────────────────────────────────────────── -->
+<aside class="sidebar-hud right" aria-label="System telemetry right">
+  <div class="sidebar-row">
+    <span class="s-label">Projects</span>
+    <span class="s-value">08</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-row">
+    <span class="s-label">Prototypes</span>
+    <span class="s-value">03</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-row">
+    <span class="s-label">Authority</span>
+    <span class="s-value">A. VENTURA</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-row">
+    <span class="s-label">Version</span>
+    <span class="s-value">2026.01</span>
+  </div>
+</aside>
+
+<!-- ─────────────────────────────────────────────────────
+  SCROLLABLE CONTENT
+────────────────────────────────────────────────────── -->
+<div id="content">
+
+  <!-- ═══════════════════  HERO  ═══════════════════ -->
+  <section id="hero" aria-label="VNUA Systems hero">
+    <!-- Corner brackets -->
+    <div class="corner corner-tl" aria-hidden="true"></div>
+    <div class="corner corner-tr" aria-hidden="true"></div>
+    <div class="corner corner-bl" aria-hidden="true"></div>
+    <div class="corner corner-br" aria-hidden="true"></div>
+    <!-- Grid crosshairs -->
+    <div class="crosshair crosshair-h" aria-hidden="true"></div>
+    <div class="crosshair crosshair-v" aria-hidden="true"></div>
+
+    <!-- HUD readouts flanking the cube -->
+    <div class="hud-readout hud-readout-tl" aria-hidden="true">
+      <div>ID: VNUA_SYS_MAIN</div>
+      <div>STAT: <span>NOMINAL</span></div>
+      <div>LAB:  <span>ACTIVE</span></div>
+      <div>RENDER: THREE.JS r169</div>
+    </div>
+    <div class="hud-readout hud-readout-tr" aria-hidden="true">
+      <div>PROJECTS:  <span>08</span></div>
+      <div>PROTOS:    <span>03</span></div>
+      <div>AUTHORITY: <span>A. VENTURA</span></div>
+      <div>VERSION:   <span>2026.01</span></div>
+    </div>
+
+    <!-- Hero text stack -->
+    <p class="hero-eyebrow reveal">Creative Engineering Identity</p>
+    <h1 class="hero-title reveal" style="transition-delay:0.1s">
+      VNUA<br><span class="accent">SYSTEMS</span>
+    </h1>
+    <p class="hero-sub reveal" style="transition-delay:0.18s">
+      Mechanical Engineering &middot; Digital Systems &middot; Technical Apparel
+    </p>
+
+    <!-- Cube interaction buttons -->
+    <div class="cube-controls reveal" style="transition-delay:0.28s" role="group" aria-label="Cube interaction controls">
+      <button class="cube-btn" id="btn-scramble" onclick="scrambleCube()">SCRAMBLE CUBE</button>
+      <button class="cube-btn" id="btn-reset"    onclick="resetCubeView()">RESET VIEW</button>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">SCROLL TO EXPLORE</div>
+  </section>
+
+  <!-- ═══════════════════  DIVISION 01 — LABS  ═══════════════════ -->
+  <section id="labs" class="section section--labs" aria-label="VNUA Labs">
+    <div class="section-inner">
+      <div class="section-grid">
+        <!-- Content panel (glass) -->
+        <div class="section-content reveal">
+          <div class="div-tag">
+            <div class="tag-dot"></div>
+            <div class="tag-line"></div>
+            VNUA LABS // DIV-01
+          </div>
+          <h2 class="section-heading">
+            <span class="word-accent">LABS</span>&amp; HARDWARE
+          </h2>
+          <p class="section-sub">
+            Mechanical design applying engineering principles to real-world product
+            development. CAD, FEA simulation, and rapid prototyping under one roof.
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <div class="card-id">LAB-PROJ-001</div>
+              <div class="card-title">Aero-Drone Chassis</div>
+              <div class="card-desc">Carbon fiber quadcopter frame optimized through generative CAD and topology optimization.</div>
+              <span class="card-tag">IN PROGRESS</span>
+            </div>
+            <div class="card">
+              <div class="card-id">LAB-PROJ-002</div>
+              <div class="card-title">FEA Thermal Rig</div>
+              <div class="card-desc">Finite Element Analysis of composite material panels under dynamic thermal loading conditions.</div>
+              <span class="card-tag">PROTOTYPE</span>
+            </div>
+          </div>
+          <a
+            class="labs-portfolio-link"
+            href="https://adrielvent.github.io/adriel-portfolio/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Adriel Ventura's mechanical engineering portfolio in a new tab"
+          >
+            <span class="labs-portfolio-link__status">LIVE DOSSIER // GITHUB PAGES</span>
+            <strong>Open Mechanical Engineering Portfolio</strong>
+            <span class="labs-portfolio-link__meta">CAD // GD&amp;T // FEA // THERMAL DESIGN // ADDITIVE MANUFACTURING</span>
+          </a>
+        </div>
+        <!-- Visual column — transparent, cube shows through -->
+        <div class="section-visual" aria-hidden="true">
+          <div class="geo-ring" style="width:320px;height:320px;animation-duration:22s;"></div>
+          <div class="geo-ring" style="width:210px;height:210px;animation-duration:15s;animation-direction:reverse;border-color:rgba(255,89,0,0.18);"></div>
+          <div class="geo-ring" style="width:110px;height:110px;animation-duration:9s;border-color:rgba(255,89,0,0.32);"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════  DIVISION 02 — SYSTEMS  ═══════════════════ -->
+  <section id="systems" class="section section--systems" aria-label="VNUA Systems">
+    <div class="section-inner">
+      <div class="section-grid">
+        <!-- Visual column left -->
+        <div class="section-visual" aria-hidden="true">
+          <div class="geo-ring" style="width:300px;height:300px;animation-duration:19s;animation-direction:reverse;"></div>
+          <div class="geo-ring" style="width:195px;height:195px;animation-duration:13s;border-color:rgba(0,230,107,0.18);"></div>
+          <div class="geo-ring" style="width:95px; height:95px; animation-duration:7s; animation-direction:reverse;border-color:rgba(0,230,107,0.32);"></div>
+        </div>
+        <!-- Content panel right -->
+        <div class="section-content reveal">
+          <div class="div-tag">
+            <div class="tag-dot"></div>
+            <div class="tag-line"></div>
+            VNUA SYSTEMS // DIV-02
+          </div>
+          <h2 class="section-heading">
+            <span class="word-accent">SYSTEMS</span>&amp; CODE
+          </h2>
+          <p class="section-sub">
+            Architecting full-stack web applications, AI workflows, and digital
+            infrastructure. Bridging the gap between code and creative logic.
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <div class="card-id">SYS-PROJ-001</div>
+              <div class="card-title">VNUA Web Platform</div>
+              <div class="card-desc">This site — built with Next.js, Three.js, Zustand state management, and a custom design system.</div>
+              <span class="card-tag">LIVE</span>
+            </div>
+            <div class="card">
+              <div class="card-id">SYS-PROJ-002</div>
+              <div class="card-title">AI Workflow Engine</div>
+              <div class="card-desc">Automated design-to-prototype pipeline using LLM-driven planning and structured data extraction.</div>
+              <span class="card-tag">IN DEVELOPMENT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════  DIVISION 03 — STUDIO  ═══════════════════ -->
+  <section id="studio" class="section section--studio" aria-label="VNUA Studio">
+    <div class="section-inner">
+      <div class="section-grid">
+        <div class="section-content reveal">
+          <div class="div-tag">
+            <div class="tag-dot"></div>
+            <div class="tag-line"></div>
+            VNUA STUDIO // DIV-03
+          </div>
+          <h2 class="section-heading">
+            <span class="word-accent">STUDIO</span>&amp; DESIGN
+          </h2>
+          <p class="section-sub">
+            Visual identity, logo systems, and brand design. Where engineering
+            precision meets creative aesthetics and typographic rigor.
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <div class="card-id">STU-PROJ-001</div>
+              <div class="card-title">VNUA Identity System</div>
+              <div class="card-desc">Complete visual identity and typographic guidelines for the VNUA brand ecosystem.</div>
+              <span class="card-tag">ACTIVE</span>
+            </div>
+            <div class="card">
+              <div class="card-id">STU-PROJ-002</div>
+              <div class="card-title">HUD Design System</div>
+              <div class="card-desc">Aerospace-inspired UI language: monospace grids, scanlines, cyan anchors, and glass panels.</div>
+              <span class="card-tag">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-visual" aria-hidden="true">
+          <div class="geo-ring" style="width:280px;height:280px;animation-duration:21s;"></div>
+          <div class="geo-ring" style="width:180px;height:180px;animation-duration:14s;animation-direction:reverse;border-style:dashed;border-color:rgba(0,85,255,0.22);"></div>
+          <div class="geo-ring" style="width:85px; height:85px; animation-duration:8s; border-color:rgba(0,85,255,0.36);"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════  DIVISION 04 — APPAREL  ═══════════════════ -->
+  <section id="apparel" class="section section--apparel" aria-label="VNUA Apparel">
+    <div class="section-inner">
+      <div class="section-grid">
+        <div class="section-visual" aria-hidden="true">
+          <div class="geo-ring" style="width:305px;height:305px;animation-duration:25s;animation-direction:reverse;"></div>
+          <div class="geo-ring" style="width:200px;height:200px;animation-duration:16s;border-style:dashed;border-color:rgba(255,0,60,0.2);"></div>
+          <div class="geo-ring" style="width:100px;height:100px;animation-duration:9s;animation-direction:reverse;border-color:rgba(255,0,60,0.36);"></div>
+        </div>
+        <div class="section-content reveal">
+          <div class="div-tag">
+            <div class="tag-dot"></div>
+            <div class="tag-line"></div>
+            VNUA APPAREL // DIV-04
+          </div>
+          <h2 class="section-heading">
+            <span class="word-accent">APPAREL</span>&amp; PROTOTYPES
+          </h2>
+          <p class="section-sub">
+            Engineered technical apparel and prototype concepts. Designed with the
+            same rigour as hardware: material specs, tolerance testing, and fit
+            engineering.
+          </p>
+          <div class="cards-grid">
+            <div class="card">
+              <div class="card-id">APR-PROTO-001</div>
+              <div class="card-title">VNUA Proto-Shell v1</div>
+              <div class="card-desc">High-tensile carbon-weave matrix. Engineered for creative mobility and urban resilience. 450g/m².</div>
+              <span class="card-tag">PROTOTYPE — $249</span>
+            </div>
+            <div class="card">
+              <div class="card-id">APR-PROTO-002</div>
+              <div class="card-title">Lab-Issued Heavy Tee</div>
+              <div class="card-desc">Heavyweight 100% organic cotton. 380g/m². Built for long-duration studio sessions.</div>
+              <span class="card-tag">ACTIVE — $89</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════  ABOUT / IDENTITY FILE  ═══════════════════ -->
+  <section id="about" aria-label="About VNUA — Identity file">
+    <div class="about-inner">
+
+      <div class="reveal">
+        <div class="about-label">// IDENTITY FILE</div>
+        <h2 class="about-title">ADRIEL<br>VENTURA</h2>
+        <p class="about-body">
+          <strong>VNUA</strong> is the creative-engineering alias of Adriel Ventura —
+          conceptualized in eighth grade as a moniker for visual art and design,
+          derived from selected letters in <em>Ventura</em>.
+          <br><br>
+          As a <strong>Mechanical Engineering student</strong>, designer, and builder,
+          VNUA now bridges technical rigor with creative aesthetic across five
+          divisions: Labs, Systems, Studio, Apparel, and Archive.
+          <br><br>
+          The mission: apply <strong>systems thinking</strong> to everything — from
+          software architecture and AI automation to physical hardware and precision
+          technical apparel.
+        </p>
+      </div>
+
+      <div class="reveal" style="transition-delay:0.15s">
+        <div class="about-stats">
+          <div class="stat-block">
+            <div class="stat-num" data-target="5">0</div>
+            <div class="stat-label">Active Divisions</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num" data-target="2018">0</div>
+            <div class="stat-label">Brand Origin</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">ME</div>
+            <div class="stat-label">Engineering Focus</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num" data-target="3">0</div>
+            <div class="stat-label">Live Prototypes</div>
+          </div>
+        </div>
+
+        <div class="sys-log" role="log" aria-live="polite" aria-label="System initialization log">
+          <div class="sys-log-title">[ SYSTEM LOG // VNUA OS_INIT ]</div>
+          <div id="sys-log-lines"></div>
+          <div class="sys-log-line" style="margin-top:0.4rem;">
+            <span class="sys-log-cursor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div><!-- /#content -->
+
+<!-- ─────────────────────────────────────────────────────
+  FOOTER
+────────────────────────────────────────────────────── -->
+<footer id="footer" aria-label="Site footer">
+
+  <!-- Infinite ticker marquee -->
+  <div class="ticker-wrap" aria-hidden="true">
+    <div class="ticker">
+      &nbsp;&nbsp;[ SYSTEM LOG // VNUA OS_INIT ]&nbsp;&nbsp;
+      &gt; LOADING VNUA OS_INIT... [OK]&nbsp;&nbsp;
+      &gt; ESTABLISHING SECURE TUNNEL... [OK]&nbsp;&nbsp;
+      &gt; SYNCING CAD REPOSITORIES... [OK]&nbsp;&nbsp;
+      &gt; LOADING CREATIVE DIRECTIVES... [OK]&nbsp;&nbsp;
+      &gt; COMPILING PORTFOLIO ASSETS... [OK]&nbsp;&nbsp;
+      &gt; ESTABLISHING SYSTEMS ARCHITECTURE... [OK]&nbsp;&nbsp;
+      &gt; PROTOTYPE LAB NOMINAL. READY TO BUILD.&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;[ SYSTEM LOG // VNUA OS_INIT ]&nbsp;&nbsp;
+      &gt; LOADING VNUA OS_INIT... [OK]&nbsp;&nbsp;
+      &gt; ESTABLISHING SECURE TUNNEL... [OK]&nbsp;&nbsp;
+      &gt; SYNCING CAD REPOSITORIES... [OK]&nbsp;&nbsp;
+      &gt; LOADING CREATIVE DIRECTIVES... [OK]&nbsp;&nbsp;
+      &gt; COMPILING PORTFOLIO ASSETS... [OK]&nbsp;&nbsp;
+      &gt; ESTABLISHING SYSTEMS ARCHITECTURE... [OK]&nbsp;&nbsp;
+      &gt; PROTOTYPE LAB NOMINAL. READY TO BUILD.&nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+
+  <!-- Footer body -->
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">VNUA</div>
+      <div class="footer-tagline">Creative Engineering Identity // 2018 — Present</div>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h5>Divisions</h5>
+        <a href="#labs">VNUA Labs</a>
+        <a href="#systems">VNUA Systems</a>
+        <a href="#studio">VNUA Studio</a>
+        <a href="#apparel">VNUA Apparel</a>
+      </div>
+      <div class="footer-col">
+        <h5>Archive</h5>
+        <a href="#about">About</a>
+        <a href="#about">Projects</a>
+        <a href="#about">Prototypes</a>
+      </div>
+      <div class="footer-col">
+        <h5>Connect</h5>
+        <a href="https://github.com/AdrielVent" target="_blank" rel="noopener">GitHub</a>
+        <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:adriel@adrielv.me">Email</a>
+      </div>
+    </div>
+
+    <!-- Email sync terminal -->
+    <div class="footer-sync">
+      <label for="email-sync-input">ENTER EMAIL SYNC</label>
+      <div class="sync-input-wrap">
+        <input
+          type="email"
+          id="email-sync-input"
+          class="sync-input"
+          placeholder="user@domain.com"
+          aria-label="Email address for system sync"
+        />
+        <button class="sync-btn" id="sync-btn" onclick="handleSync()">SYNC</button>
+      </div>
+      <span class="sync-confirm" id="sync-confirm" role="status">
+        &gt; CONNECTION ESTABLISHED [OK]
+      </span>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>&copy; 2026 VNUA SYSTEMS. ALL RIGHTS RESERVED.</span>
+    <span>LAT: 40.7128° N &nbsp; LON: 74.0060° W</span>
+    <span>ADRIEL VENTURA // SECURE CONNECTION</span>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+   MAIN APPLICATION SCRIPT
+   Architecture:
+     § Three.js r169   — 27-cubie Rubik's Cube (THREE.Group)
+     § GSAP 3.12.5     — Scroll-driven rotation via scrollProxy object
+     § IntersectionObs — Section reveals & stat counter triggers
+     § Manual lerp     — Mouse orbital micro-drift physics
+     § Cursor          — Custom lag-ring cursor
+     § HUD Clock       — Real-time setInterval ticker
+     § System Log      — Typewriter terminal effect
+     § Email Sync      — Input validation + confirmation
+═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ─────────────────────────────────────────────────────
+     Wait for all CDN scripts to have finished loading
+  ──────────────────────────────────────────────────── */
+  window.addEventListener('load', function () {
+
+    /* Register GSAP ScrollTrigger plugin */
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ═══════════════════════════════════════════════════
+       § 1. THREE.JS — SCENE, CAMERA, RENDERER
+    ═══════════════════════════════════════════════════ */
+
+    var canvas   = document.getElementById('cube-canvas');
+    var scene    = new THREE.Scene();
+
+    /* Perspective camera: 45° FOV, updated on resize */
+    var camera   = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 7.2);
+
+    /* WebGL renderer — alpha:true for transparent background */
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    /* ═══════════════════════════════════════════════════
+       § 2. LIGHTING SETUP
+       Three-point: ambient fill + key + cool rim
+    ═══════════════════════════════════════════════════ */
+
+    /* Soft ambient fill */
+    var ambLight = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambLight);
+
+    /* Warm key light from top-right-front */
+    var keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    keyLight.position.set(4, 6, 5);
+    scene.add(keyLight);
+
+    /* Cyan rim light from bottom-left-back for HUD glow effect */
+    var rimLight = new THREE.DirectionalLight(0x00F0FF, 0.35);
+    rimLight.position.set(-4, -3, -4);
+    scene.add(rimLight);
+
+    /* ═══════════════════════════════════════════════════
+       § 3. RUBIK'S CUBE CONSTRUCTION
+       Source A: THREE.Group container for all 27 cubies
+       Source B: Local-to-global matrix independence —
+                 each cubie's position is stored in its
+                 own local coordinate space inside the group.
+       Source C: Coordinate mapping — face color assigned
+                 by testing the cubie's grid position (xi,yi,zi)
+                 against each axis boundary.
+    ═══════════════════════════════════════════════════ */
+
+    var cubeGroup = new THREE.Group();
+    scene.add(cubeGroup);
+
+    /* Dark interior color — creates visible separation gap between faces */
+    var DARK = 0x0A0A0C;
+
+    /* Brand-mapped face color tokens */
+    var C_ORANGE = 0xFF5900; /* Labs     — right  (+X) face */
+    var C_GREEN  = 0x00E66B; /* Systems  — left   (-X) face */
+    var C_BLUE   = 0x0055FF; /* Studio   — top    (+Y) face */
+    var C_RED    = 0xFF003C; /* Apparel  — bottom (-Y) face */
+    var C_WHITE  = 0xFFFFFF; /* ——         front  (+Z) face */
+    var C_GOLD   = 0xFFD700; /* ——         back   (-Z) face */
+
+    /*
+      BoxGeometry face material index order (Three.js standard):
+        Index 0: +X (right)     Index 1: -X (left)
+        Index 2: +Y (top)       Index 3: -Y (bottom)
+        Index 4: +Z (front)     Index 5: -Z (back)
+    */
+    var cubieGeo = new THREE.BoxGeometry(0.905, 0.905, 0.905);
+    var SPACING  = 1.02; /* center-to-center distance between adjacent cubies */
+
+    /* Build all 27 cubies in a 3x3x3 loop */
+    for (var xi = -1; xi <= 1; xi++) {
+      for (var yi = -1; yi <= 1; yi++) {
+        for (var zi = -1; zi <= 1; zi++) {
+
+          /* Resolve each face's color: exterior face gets brand color,
+             interior face (not on the cube surface) gets dark gap color */
+          var faceMaterials = [
+            new THREE.MeshStandardMaterial({ color: xi ===  1 ? C_ORANGE : DARK, roughness: xi ===  1 ? 0.22 : 0.92, metalness: xi ===  1 ? 0.12 : 0.0 }),
+            new THREE.MeshStandardMaterial({ color: xi === -1 ? C_GREEN  : DARK, roughness: xi === -1 ? 0.22 : 0.92, metalness: xi === -1 ? 0.12 : 0.0 }),
+            new THREE.MeshStandardMaterial({ color: yi ===  1 ? C_BLUE   : DARK, roughness: yi ===  1 ? 0.22 : 0.92, metalness: yi ===  1 ? 0.12 : 0.0 }),
+            new THREE.MeshStandardMaterial({ color: yi === -1 ? C_RED    : DARK, roughness: yi === -1 ? 0.22 : 0.92, metalness: yi === -1 ? 0.12 : 0.0 }),
+            new THREE.MeshStandardMaterial({ color: zi ===  1 ? C_WHITE  : DARK, roughness: zi ===  1 ? 0.22 : 0.92, metalness: zi ===  1 ? 0.12 : 0.0 }),
+            new THREE.MeshStandardMaterial({ color: zi === -1 ? C_GOLD   : DARK, roughness: zi === -1 ? 0.22 : 0.92, metalness: zi === -1 ? 0.12 : 0.0 }),
+          ];
+
+          var cubie = new THREE.Mesh(cubieGeo, faceMaterials);
+          cubie.position.set(xi * SPACING, yi * SPACING, zi * SPACING);
+          cubeGroup.add(cubie);
+        }
+      }
+    }
+
+    /* Non-flat initial tilt so all faces are partially visible on load */
+    cubeGroup.rotation.x =  0.38;
+    cubeGroup.rotation.y = -0.48;
+
+    /* ═══════════════════════════════════════════════════
+       § 4. SCROLL PROXY — GSAP-CONTROLLED ROTATION
+       Using a proxy object isolates GSAP's ScrollTrigger
+       tween from the manual drift/idle additions in the
+       animation loop, preventing property conflicts.
+       Source B: Abstract spatial transform separation
+    ═══════════════════════════════════════════════════ */
+
+    var scrollProxy = { rotX: 0.38, rotY: -0.48 };
+
+    gsap.to(scrollProxy, {
+      rotY: scrollProxy.rotY + Math.PI * 6,  /* 3 full Y-axis revolutions across full scroll */
+      rotX: scrollProxy.rotX + Math.PI * 2,  /* 1 full X-axis revolution */
+      ease: 'none',
+      scrollTrigger: {
+        trigger:  '#content',
+        start:    'top top',
+        end:      'bottom bottom',
+        scrub:    2.0, /* seconds of lag for smooth scrubbing feel */
+      }
+    });
+
+    /* Separate offset object for scramble/reset — no GSAP property conflicts */
+    var scrambleOffset = { x: 0, y: 0 };
+
+    /* ═══════════════════════════════════════════════════
+       § 5. PUBLIC CUBE CONTROLS
+    ═══════════════════════════════════════════════════ */
+
+    window.scrambleCube = function () {
+      gsap.to(scrambleOffset, {
+        x: scrambleOffset.x + (Math.random() - 0.5) * Math.PI * 5.5,
+        y: scrambleOffset.y + (Math.random() - 0.5) * Math.PI * 7.0,
+        duration: 2.2,
+        ease: 'power3.inOut',
+      });
+    };
+
+    window.resetCubeView = function () {
+      gsap.to(scrambleOffset, {
+        x: 0, y: 0,
+        duration: 1.6,
+        ease: 'power2.inOut',
+      });
+    };
+
+    /* ═══════════════════════════════════════════════════
+       § 6. MOUSE TRACKING — MICRO-DRIFT PHYSICS
+       Source C: Linear interpolation (lerp) maps the
+       normalized mouse position to slow orbital drift.
+       driftX/Y accumulate gradually, preventing snapping.
+    ═══════════════════════════════════════════════════ */
+
+    var mouseNX   = 0;  /* normalized mouse X: -1 (left) to 1 (right) */
+    var mouseNY   = 0;  /* normalized mouse Y: -1 (top)  to 1 (bottom) */
+    var driftX    = 0;  /* accumulated X drift (radians) */
+    var driftY    = 0;  /* accumulated Y drift (radians) */
+    var DRIFT_MAX = 0.20; /* maximum influence magnitude in radians */
+    var LERP_SPD  = 0.038; /* lerp speed per frame — lower = more lag/inertia */
+
+    document.addEventListener('mousemove', function (e) {
+      mouseNX = (e.clientX / window.innerWidth  - 0.5) * 2.0;
+      mouseNY = (e.clientY / window.innerHeight - 0.5) * 2.0;
+    });
+
+    /* ═══════════════════════════════════════════════════
+       § 7. CUSTOM CURSOR with elastic ring
+    ═══════════════════════════════════════════════════ */
+
+    var cursorDot  = document.getElementById('cursor');
+    var cursorRing = document.getElementById('cursor-ring');
+    var cursorX = 0, cursorY = 0; /* raw mouse position */
+    var ringX   = 0, ringY   = 0; /* lagged ring position */
+
+    document.addEventListener('mousemove', function (e) {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+      cursorDot.style.left = cursorX + 'px';
+      cursorDot.style.top  = cursorY + 'px';
+    });
+
+    /* Ring follows dot with elastic lerp — runs its own RAF loop */
+    (function tickRing() {
+      ringX += (cursorX - ringX) * 0.11;
+      ringY += (cursorY - ringY) * 0.11;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top  = ringY + 'px';
+      requestAnimationFrame(tickRing);
+    })();
+
+    /* Scale ring up on interactive elements */
+    document.querySelectorAll('a, button, .card, .cube-btn').forEach(function (el) {
+      el.addEventListener('mouseenter', function () {
+        cursorRing.style.transform = 'translate(-50%,-50%) scale(1.8)';
+        cursorRing.style.borderColor = 'rgba(0,240,255,0.8)';
+      });
+      el.addEventListener('mouseleave', function () {
+        cursorRing.style.transform = 'translate(-50%,-50%) scale(1)';
+        cursorRing.style.borderColor = 'rgba(0,240,255,0.55)';
+      });
+    });
+
+    /* ═══════════════════════════════════════════════════
+       § 8. MAIN ANIMATION LOOP
+       Composes final cube rotation from three sources:
+         1. scrollProxy.rotX/Y  — GSAP ScrollTrigger driven
+         2. driftX/Y            — mouse lerp micro-drift
+         3. idleY               — slow constant auto-spin
+       Plus a sinusoidal vertical float (bobY).
+    ═══════════════════════════════════════════════════ */
+
+    var clock    = new THREE.Clock();
+    var IDLE_SPD = 0.10; /* radians per second for idle auto-spin */
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      var t = clock.getElapsedTime();
+
+      /* Lerp drift toward current mouse position */
+      driftX += (-mouseNY * DRIFT_MAX - driftX) * LERP_SPD;
+      driftY += ( mouseNX * DRIFT_MAX - driftY) * LERP_SPD;
+
+      /* Idle spin accumulates over time (radians) */
+      var idleY = t * IDLE_SPD;
+
+      /* Sinusoidal float — 0.07 units amplitude at 0.55 Hz */
+      var bobY = Math.sin(t * 0.55) * 0.07;
+
+      /* Apply composed rotation */
+      cubeGroup.rotation.x = scrollProxy.rotX + driftX + scrambleOffset.x;
+      cubeGroup.rotation.y = scrollProxy.rotY + driftY + idleY + scrambleOffset.y;
+      cubeGroup.position.y = bobY;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    /* ─── Responsive canvas resize ─── */
+    window.addEventListener('resize', function () {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+
+    /* ═══════════════════════════════════════════════════
+       § 9. GSAP SECTION ANIMATIONS
+       A. Liquid float — content panels drift upward at a
+          different scroll rate than the page, creating a
+          parallax depth effect relative to the cube.
+       B. Fade-slide — panels enter from below as they
+          enter the viewport.
+    ═══════════════════════════════════════════════════ */
+
+    /* A. Liquid parallax float for each content panel */
+    gsap.utils.toArray('.section-content').forEach(function (panel) {
+      gsap.to(panel, {
+        y: -35,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: panel.closest('.section'),
+          start:   'top bottom',
+          end:     'bottom top',
+          scrub:   1.6,
+        }
+      });
+    });
+
+    /* B. Fade-slide entrance for each content panel */
+    gsap.utils.toArray('.section-content').forEach(function (panel) {
+      gsap.fromTo(panel,
+        { opacity: 0, y: 55 },
+        {
+          opacity: 1, y: 0,
+          duration: 1.0,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger:      panel,
+            start:        'top 82%',
+            toggleActions: 'play none none none',
+          }
+        }
+      );
+    });
+
+    /* ═══════════════════════════════════════════════════
+       § 10. HUD REAL-TIME CLOCK
+    ═══════════════════════════════════════════════════ */
+
+    var hudTime = document.getElementById('hud-time');
+
+    function updateClock() {
+      var now = new Date();
+      var hh  = String(now.getHours()).padStart(2, '0');
+      var mm  = String(now.getMinutes()).padStart(2, '0');
+      var ss  = String(now.getSeconds()).padStart(2, '0');
+      hudTime.textContent = hh + ':' + mm + ':' + ss;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    /* ═══════════════════════════════════════════════════
+       § 11. SYSTEM LOG TYPEWRITER
+       Lines append one at a time with 650ms interval,
+       triggered by ScrollTrigger when #about enters view.
+    ═══════════════════════════════════════════════════ */
+
+    var logLines = [
+      '&gt; LOADING VNUA OS_INIT...',
+      '&gt; ESTABLISHING SECURE TUNNEL... <span class="ok">[OK]</span>',
+      '&gt; SYNCING CAD REPOSITORIES... <span class="ok">[OK]</span>',
+      '&gt; LOADING CREATIVE DIRECTIVES... <span class="ok">[OK]</span>',
+      '&gt; COMPILING PORTFOLIO ASSETS... <span class="ok">[OK]</span>',
+      '&gt; ESTABLISHING SYSTEMS ARCHITECTURE... <span class="ok">[OK]</span>',
+      '&gt; ALL SYSTEMS NOMINAL. READY TO BUILD. <span class="ok">[READY]</span>',
+    ];
+
+    var logContainer = document.getElementById('sys-log-lines');
+    var logIndex     = 0;
+    var logStarted   = false;
+
+    function appendLogLine() {
+      if (logIndex >= logLines.length) return;
+      var div = document.createElement('div');
+      div.className = 'sys-log-line';
+      div.innerHTML = logLines[logIndex];
+      logContainer.appendChild(div);
+      logIndex++;
+      logContainer.scrollTop = logContainer.scrollHeight;
+      if (logIndex < logLines.length) {
+        setTimeout(appendLogLine, 650);
+      }
+    }
+
+    ScrollTrigger.create({
+      trigger: '#about',
+      start:   'top 72%',
+      onEnter: function () {
+        if (!logStarted) {
+          logStarted = true;
+          appendLogLine();
+        }
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════
+       § 12. ANIMATED STAT COUNTERS
+       Counts from 0 to data-target when scrolled into view
+    ═══════════════════════════════════════════════════ */
+
+    document.querySelectorAll('.stat-num[data-target]').forEach(function (el) {
+      var target  = parseInt(el.dataset.target, 10);
+      var started = false;
+
+      ScrollTrigger.create({
+        trigger: el,
+        start:   'top 85%',
+        onEnter: function () {
+          if (started) return;
+          started = true;
+          gsap.to({ val: 0 }, {
+            val:      target,
+            duration: 1.9,
+            ease:     'power2.out',
+            onUpdate: function () {
+              el.textContent = Math.round(this.targets()[0].val).toString();
+            }
+          });
+        }
+      });
+    });
+
+    /* ═══════════════════════════════════════════════════
+       § 13. SECTION REVEAL — IntersectionObserver
+       Hero reveals fire immediately on load.
+       All other .reveal elements fire when 15% visible.
+    ═══════════════════════════════════════════════════ */
+
+    var revealObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      revealObs.observe(el);
+    });
+
+    /* Trigger hero elements immediately after paint */
+    setTimeout(function () {
+      document.querySelectorAll('#hero .reveal').forEach(function (el) {
+        el.classList.add('in-view');
+      });
+    }, 180);
+
+    /* ═══════════════════════════════════════════════════
+       § 14. EMAIL SYNC HANDLER
+    ═══════════════════════════════════════════════════ */
+
+    window.handleSync = function () {
+      var input   = document.getElementById('email-sync-input');
+      var confirm = document.getElementById('sync-confirm');
+      var btn     = document.getElementById('sync-btn');
+
+      /* Validate email format */
+      if (!input.value || !input.value.includes('@') || !input.value.includes('.')) {
+        input.style.boxShadow = '0 0 0 1px var(--red)';
+        input.focus();
+        setTimeout(function () { input.style.boxShadow = ''; }, 1600);
+        return;
+      }
+
+      /* Success state */
+      btn.textContent       = 'SYNCED';
+      btn.style.color       = 'var(--green)';
+      btn.disabled          = true;
+      input.disabled        = true;
+      input.value           = '';
+      confirm.style.display = 'block';
+    };
+
+  }); /* end window.load */
+
+})();
+</script>
+
+</body>
+</html>
