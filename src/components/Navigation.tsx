@@ -9,7 +9,10 @@ export function Navigation() {
   const { items, toggleCart } = useCartStore();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="flex flex-col md:flex-row justify-between items-center brutal-border-b font-mono text-sm tracking-widest uppercase bg-circuit-gold z-40 relative">

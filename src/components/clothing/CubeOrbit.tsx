@@ -40,7 +40,7 @@ export function CubeOrbit({ exitProgress = 0 }: CubeOrbitProps) {
           }}
           initial={shouldReduce ? {} : { opacity: 0, scale: 0.4 }}
           animate={shouldReduce ? {} : { opacity: 1 - exitProgress * 0.85, scale: 1 - exitProgress * 0.3 }}
-          transition={{ delay: cube.delay, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ delay: cube.delay, duration: 0.8, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
         >
           <FloatingCube
             color={cube.color}

@@ -55,7 +55,7 @@ export default function Home() {
             <motion.h1
               initial={{ opacity: 0, y: shouldReduce ? 0 : 28 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.35, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ duration: 0.8, delay: 0.35, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
               className="font-sans font-black text-gray-900 leading-tight tracking-tight"
               style={{ fontSize: 'clamp(42px, 7vw, 88px)' }}
             >

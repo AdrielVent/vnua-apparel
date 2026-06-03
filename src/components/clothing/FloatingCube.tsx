@@ -21,17 +21,17 @@ export function FloatingCube({
   color,
   size = 64,
   delay = 0,
-  targetX,
-  targetY,
-  assembleProgress = 0,
   className = '',
   onClick,
   label,
-}: FloatingCubeProps) {
+}: Omit<FloatingCubeProps, 'targetX' | 'targetY' | 'assembleProgress'>) {
   const shouldReduce = useReducedMotion();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   // Sticker inset = 78% of body size
   const stickerSize = Math.round(size * 0.78);
@@ -43,7 +43,7 @@ export function FloatingCube({
     transition: {
       duration: 5 + delay * 0.7,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: 'easeInOut' as const,
       delay,
     },
   };

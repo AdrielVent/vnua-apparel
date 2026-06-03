@@ -52,7 +52,7 @@ export function LookbookPanel() {
             initial={{ opacity: 0, y: shouldReduce ? 0 : 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-5%' }}
-            transition={{ delay: i * 0.12, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ delay: i * 0.12, duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
             whileHover={shouldReduce ? {} : { y: -4 }}
             className="panel flex flex-col overflow-hidden"
           >

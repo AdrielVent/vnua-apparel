@@ -4,6 +4,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useCartStore } from '@/store/cartStore';
 import { useState, useEffect } from 'react';
 
+import Link from 'next/link';
+
 const NAV_TABS = [
   { label: 'New Drop',    href: '#drop' },
   { label: 'Clothing',   href: '#grid' },
@@ -30,7 +32,7 @@ export function ClothingNav() {
     <motion.header
       initial={{ opacity: 0, y: shouldReduce ? 0 : -24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+      transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
       className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center pt-4 px-4 pointer-events-none"
     >
       <div
@@ -95,13 +97,13 @@ export function ClothingNav() {
         </motion.button>
 
         {/* Hub Access link */}
-        <a
+        <Link
           href="/"
           className="px-3 py-2 text-[11px] font-mono font-bold tracking-widest uppercase text-gray-400 hover:text-gray-700 transition-colors"
           title="VNUA Main Hub"
         >
           Hub ↗
-        </a>
+        </Link>
       </div>
     </motion.header>
   );

@@ -30,7 +30,7 @@ export function ScrollProductSpotlight({ product, index, reverse = false }: Scro
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: [0.23, 1, 0.32, 1], delay: 0.1 },
+      transition: { duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number], delay: 0.1 },
     },
   };
 
@@ -40,7 +40,7 @@ export function ScrollProductSpotlight({ product, index, reverse = false }: Scro
       opacity: 1,
       scale: 1,
       rotate: 0,
-      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
     },
   };
 

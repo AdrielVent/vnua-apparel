@@ -9,6 +9,18 @@ const GRID_COLORS = [
   '#0046AD', '#FFD500', '#009B48',
 ];
 
+const OFFSETS = [
+  { x: -50, y: -45 },
+  { x: 30, y: -60 },
+  { x: 80, y: -30 },
+  { x: -70, y: 10 },
+  { x: 10, y: -15 },
+  { x: 60, y: 25 },
+  { x: -40, y: 70 },
+  { x: 20, y: 55 },
+  { x: 80, y: 40 },
+];
+
 interface AssemblingCubeGridProps {
   products: ClothingProduct[];
 }
@@ -44,6 +56,7 @@ export function AssemblingCubeGrid({ products }: AssemblingCubeGridProps) {
       <div className="cube-grid-3x3 w-[240px] md:w-[300px]">
         {GRID_COLORS.map((color, i) => {
           const product = products[i % products.length];
+          const offset = OFFSETS[i % OFFSETS.length];
           return (
             <motion.div
               key={i}
@@ -51,8 +64,8 @@ export function AssemblingCubeGrid({ products }: AssemblingCubeGridProps) {
                 hidden: {
                   opacity: 0,
                   scale: shouldReduce ? 1 : 0.3,
-                  x: shouldReduce ? 0 : (Math.random() - 0.5) * 120,
-                  y: shouldReduce ? 0 : (Math.random() - 0.5) * 120,
+                  x: shouldReduce ? 0 : offset.x,
+                  y: shouldReduce ? 0 : offset.y,
                 },
                 visible: {
                   opacity: 1,
@@ -62,7 +75,7 @@ export function AssemblingCubeGrid({ products }: AssemblingCubeGridProps) {
                   transition: {
                     delay: i * 0.06,
                     duration: 0.6,
-                    ease: [0.23, 1, 0.32, 1],
+                    ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
                   },
                 },
               }}
