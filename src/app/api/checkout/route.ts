@@ -20,6 +20,12 @@ export async function POST(request: Request) {
       quantity: item.quantity,
     }));
 
+    // Package item mappings for Printful webhook processing
+    const metadataItems = items.map((item: any) => ({
+      printfulVariantId: item.printfulVariantId || 0, // Fallback if dummy
+      quantity: item.quantity,
+    }));
+
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -29,6 +35,9 @@ export async function POST(request: Request) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop/cancel`,
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB'],
+      },
+      metadata: {
+        items: JSON.stringify(metadataItems),
       },
     });
 
