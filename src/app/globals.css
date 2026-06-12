@@ -3,20 +3,20 @@
 /* ─────────────────────────────────────────────────
    VNUA CLOTHING — LIGHT THEME DESIGN TOKENS
    Wii-channel premium clarity + puzzle-cube accents
-───────────────────────────────────────────────── */
+ ───────────────────────────────────────────────── */
 :root {
   /* Core backgrounds */
   --background:    #FFFFFF;
-  --bg-subtle:     #F6F6F6;
-  --bg-pattern:    #F3F3F3;
+  --bg-subtle:     #F9F9F9;
+  --bg-pattern:    #F5F5F5;
   --surface:       #FFFFFF;
-  --surface-raised: #FAFAFA;
+  --surface-raised: #FFFFFF;
 
   /* Typography */
-  --foreground:    #0A0A0A;
-  --ink-mid:       #444444;
-  --ink-light:     #999999;
-  --ink-xlight:    #CCCCCC;
+  --foreground:    #1A1A1A;
+  --ink-mid:       #333333;
+  --ink-light:     #666666;
+  --ink-xlight:    #999999;
 
   /* Puzzle-cube accent palette — legally clean generic tones */
   --cube-red:      #D00000;
@@ -25,7 +25,7 @@
   --cube-green:    #009B48;
   --cube-orange:   #FF5800;
   --cube-white:    #FFFFFF;
-  --cube-black:    #1A1A1A;  /* plastic body */
+  --cube-black:    #1A1A1A;
 
   /* Legacy support (keep brutalist pages working) */
   --cyan:          #00F3FF;
@@ -37,18 +37,18 @@
   --stark-white:   #FFFFFF;
 
   /* Panel system */
-  --radius-sm:     10px;
-  --radius:        18px;
-  --radius-lg:     28px;
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.06);
-  --shadow:        0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-  --shadow-lg:     0 12px 48px rgba(0,0,0,0.10), 0 4px 16px rgba(0,0,0,0.05);
-  --shadow-xl:     0 24px 80px rgba(0,0,0,0.12);
+  --radius-sm:     4px;
+  --radius:        4px;
+  --radius-lg:     4px;
+  --shadow-sm:     2px 2px 0px #1A1A1A;
+  --shadow:        4px 4px 0px #1A1A1A;
+  --shadow-lg:     8px 8px 0px #1A1A1A;
+  --shadow-xl:     12px 12px 0px #1A1A1A;
 
   /* Borders */
-  --border-thick: 4px solid #000000;
-  --border-thin:  2px solid #000000;
-  --border-soft:  1px solid rgba(0,0,0,0.08);
+  --border-thick: 3px solid #1A1A1A;
+  --border-thin:  2px solid #1A1A1A;
+  --border-soft:  1px solid #1A1A1A;
 }
 
 /* ─── Tailwind 4 theme bridge ────────────────── */
@@ -96,55 +96,68 @@ body {
 
 /* Subtle vertical stripe pattern (very light) */
 .bg-stripe-pattern {
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 39px,
-    rgba(0,0,0,0.03) 39px,
-    rgba(0,0,0,0.03) 40px
-  );
+  background-image: 
+    linear-gradient(to right, #1A1A1A 1px, transparent 1px),
+    linear-gradient(to bottom, #1A1A1A 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-color: #FAFAFA;
 }
 
 /* Soft panel card */
 .panel {
   background: var(--surface);
+  border: var(--border-thin);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .panel-raised {
   background: var(--surface);
-  border-radius: var(--radius);
+  border: var(--border-thick);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.interactive-module {
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.interactive-module:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1A1A1A;
+}
+.interactive-module:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #1A1A1A;
 }
 
 /* ─────────────────────────────────────────────────
    FLOATING CUBE — The physical plastic cubie
-───────────────────────────────────────────────── */
+   ───────────────────────────────────────────────── */
 .cubie-body {
   background: var(--cube-black);
-  border-radius: 14px;
-  box-shadow:
-    3px 5px 18px rgba(0,0,0,0.22),
-    inset 0 1px 0 rgba(255,255,255,0.12);
+  border: var(--border-thin);
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .cubie-sticker {
-  border-radius: 9px;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,0.18),
-    0 1px 0 rgba(255,255,255,0.25);
+  border-radius: 2px;
+  border: 1px solid #1A1A1A;
 }
 
 /* ─────────────────────────────────────────────────
    SCROLL PRODUCT SPOTLIGHT
-───────────────────────────────────────────────── */
+   ───────────────────────────────────────────────── */
 .spotlight-image-frame {
   background: var(--bg-subtle);
+  border: var(--border-thin);
   border-radius: var(--radius-lg);
   aspect-ratio: 1 / 1;
   display: flex;
@@ -156,32 +169,31 @@ body {
 
 /* ─────────────────────────────────────────────────
    3×3 ASSEMBLING CUBE GRID
-───────────────────────────────────────────────── */
+   ───────────────────────────────────────────────── */
 .cube-grid-3x3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding: 6px;
+  gap: 8px;
+  padding: 8px;
   background: var(--cube-black);
-  border-radius: 22px;
-  box-shadow: var(--shadow-xl);
+  border: var(--border-thin);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 /* ─────────────────────────────────────────────────
    NAV PILL
-───────────────────────────────────────────────── */
+   ───────────────────────────────────────────────── */
 .nav-pill {
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 100px;
-  border: 1px solid rgba(0,0,0,0.07);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  background: var(--surface);
+  border: var(--border-thin);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 /* ─────────────────────────────────────────────────
    LEGACY BRUTALIST UTILITIES (keep old pages working)
-───────────────────────────────────────────────── */
+   ───────────────────────────────────────────────── */
 .brutal-border   { border: var(--border-thick); }
 .brutal-border-b { border-bottom: var(--border-thick); }
 .brutal-border-r { border-right: var(--border-thick); }

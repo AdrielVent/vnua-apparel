@@ -30,15 +30,15 @@ export function LookbookPanel() {
   const shouldReduce = useReducedMotion();
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-6 md:px-12 py-24">
+    <section className="w-full max-w-6xl mx-auto px-6 md:px-12 py-24 border-b border-[#1A1A1A]">
       <motion.div
-        initial={{ opacity: 0, y: shouldReduce ? 0 : 24 }}
+        initial={{ opacity: 0, y: shouldReduce ? 0 : 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.4 }}
         className="mb-12"
       >
-        <p className="text-xs tracking-[0.3em] text-gray-400 uppercase font-mono mb-3">Lookbook</p>
+        <p className="text-xs tracking-[0.3em] text-gray-500 uppercase font-mono mb-3 font-bold">Lookbook</p>
         <h2 className="font-sans text-4xl font-black text-gray-900 tracking-tight">
           Outfit cells.<br />
           <span className="text-gray-400">One grid, infinite builds.</span>
@@ -47,45 +47,36 @@ export function LookbookPanel() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {LOOKBOOK_ENTRIES.map((entry, i) => (
-          <motion.div
+          <div
             key={i}
-            initial={{ opacity: 0, y: shouldReduce ? 0 : 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-5%' }}
-            transition={{ delay: i * 0.12, duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
-            whileHover={shouldReduce ? {} : { y: -4 }}
-            className="panel flex flex-col overflow-hidden"
+            className="panel flex flex-col overflow-hidden bg-white border-2 border-[#1A1A1A] rounded-[4px] shadow-[4px_4px_0px_#1A1A1A] transition-all hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_#1A1A1A]"
           >
             {/* Image area */}
             <div
-              className="w-full aspect-[4/5] flex items-center justify-center relative overflow-hidden"
-              style={{ background: `${entry.cubeColor}10` }}
+              className="w-full aspect-[4/5] flex items-center justify-center relative overflow-hidden border-b-2 border-[#1A1A1A] bg-stripe-pattern"
             >
               {/* Placeholder visual */}
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-2">
                 {/* Mini cube stack */}
                 {[0, 1, 2].map((j) => (
-                  <motion.div
+                  <div
                     key={j}
-                    className="w-14 h-14 rounded-xl"
+                    className="w-14 h-14 rounded-[2px] border-2 border-[#1A1A1A] bg-white shadow-[2px_2px_0px_#1A1A1A]"
                     style={{
-                      background: '#1A1A1A',
-                      marginTop: j === 0 ? 0 : -28,
-                      marginLeft: j * 8,
+                      marginTop: j === 0 ? 0 : -32,
+                      marginLeft: j * 12,
                     }}
-                    animate={shouldReduce ? {} : { y: [0, -4 + j * 2, 0] }}
-                    transition={{ duration: 3 + j * 0.5, repeat: Infinity, ease: 'easeInOut', delay: j * 0.2 }}
                   >
                     <div
-                      className="m-2 w-[calc(100%-16px)] h-[calc(100%-16px)] rounded-lg"
-                      style={{ background: entry.cubeColor, opacity: 0.9 - j * 0.1 }}
+                      className="w-full h-full"
+                      style={{ background: entry.cubeColor, opacity: 1 - j * 0.2 }}
                     />
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
               {/* Mood tag */}
-              <div className="absolute bottom-3 left-3 right-3 text-[10px] font-mono text-gray-500 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 tracking-widest uppercase">
+              <div className="absolute bottom-3 left-3 right-3 text-[10px] font-mono text-[#1A1A1A] font-bold bg-white border border-[#1A1A1A] rounded-[2px] px-3 py-2 tracking-widest uppercase shadow-[2px_2px_0px_#1A1A1A]">
                 {entry.mood}
               </div>
             </div>
@@ -93,14 +84,14 @@ export function LookbookPanel() {
             {/* Info */}
             <div className="p-5 flex flex-col gap-2">
               <div
-                className="w-6 h-6 rounded-md"
+                className="w-6 h-6 rounded-[2px] border border-[#1A1A1A]"
                 style={{ background: entry.cubeColor }}
               />
               <h3 className="font-sans font-black text-lg text-gray-900">{entry.title}</h3>
               <p className="text-xs font-mono text-gray-500 font-bold tracking-wider">{entry.subtitle}</p>
               <p className="text-xs font-mono text-gray-400 leading-relaxed">{entry.description}</p>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>

@@ -3,7 +3,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useRef } from 'react';
 import { ClothingNav } from '@/components/clothing/ClothingNav';
-import { CubeOrbit } from '@/components/clothing/CubeOrbit';
 import { ScrollProductSpotlight } from '@/components/clothing/ScrollProductSpotlight';
 import { ProductCubeCard } from '@/components/clothing/ProductCubeCard';
 import { AssemblingCubeGrid } from '@/components/clothing/AssemblingCubeGrid';
@@ -18,6 +17,15 @@ const SPOTLIGHT_PRODUCTS = CLOTHING_PRODUCTS.slice(0, 3);
 // All 6 for the grid
 const GRID_PRODUCTS = CLOTHING_PRODUCTS;
 
+// Decorative color tiles for the Hero asymmetric matrix
+const HERO_TILES = [
+  { color: '#D00000', label: 'MOD-01', row: 1, col: 1 },
+  { color: '#0046AD', label: 'SYS-A', row: 1, col: 4 },
+  { color: '#009B48', label: 'CELL-02', row: 2, col: 5 },
+  { color: '#FFD500', label: 'CTRL-Y', row: 4, col: 1 },
+  { color: '#FF5800', label: 'GRID-B', row: 4, col: 5 },
+];
+
 export default function Home() {
   const shouldReduce = useReducedMotion();
   const { toggleCart } = useCartStore();
@@ -25,93 +33,99 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Floating pill nav ─────────────────── */}
+      {/* ── Dashboard Nav ─────────────────── */}
       <ClothingNav />
 
       <div
-        className="min-h-screen bg-white bg-stripe-pattern overflow-x-hidden"
-        style={{ paddingTop: 0 }}
+        className="min-h-screen bg-white bg-stripe-pattern overflow-x-hidden pt-[68px]"
       >
 
         {/* ════════════════════════════════════════
-            HERO — Orbit stage
-        ════════════════════════════════════════ */}
+            HERO — Asymmetric Matrix Stage
+            ════════════════════════════════════════ */}
         <section
           id="hero"
-          className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden"
+          className="relative w-full min-h-[calc(100vh-68px)] flex items-center justify-center border-b-2 border-[#1A1A1A] p-6"
         >
-          {/* Background cubie constellation */}
-          <CubeOrbit gridRef={gridRef} />
+          {/* Asymmetric Technical Grid Matrix Frame */}
+          <div className="w-full max-w-6xl border-2 border-[#1A1A1A] bg-white grid grid-cols-1 md:grid-cols-5 md:grid-rows-4 divide-y-2 md:divide-y-0 md:divide-x-2 divide-[#1A1A1A] shadow-[8px_8px_0px_#1A1A1A] rounded-[4px] overflow-hidden">
+            
+            {/* Row 1 / Col 1-5 */}
+            <div className="p-6 md:col-span-3 md:row-span-3 flex flex-col justify-between min-h-[340px] md:min-h-[480px]">
+              <div>
+                <p className="text-[10px] tracking-[0.35em] text-gray-500 uppercase font-mono font-bold mb-4">
+                  VNUA // SYSTEM CODE // DROP 01
+                </p>
+                <h1
+                  className="font-sans font-black text-gray-900 leading-tight tracking-tight uppercase"
+                  style={{ fontSize: 'clamp(36px, 5vw, 68px)' }}
+                >
+                  Modular apparel<br />
+                  <span className="text-gray-400">for creative systems.</span>
+                </h1>
+              </div>
 
-          {/* Hero text */}
-          <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
-            <motion.p
-              initial={{ opacity: 0, y: shouldReduce ? 0 : 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xs tracking-[0.35em] text-gray-400 uppercase font-mono mb-5"
-            >
-              VNUA · Modular Clothing System · Drop 01
-            </motion.p>
+              <div>
+                <p className="text-xs font-mono text-[#1A1A1A] font-bold tracking-widest uppercase mb-6 max-w-lg leading-relaxed">
+                  Built from motion, color, and controlled chassis coordinates. Snapped to specification.
+                </p>
+                <div className="flex items-center gap-4">
+                  <a
+                    href="#drop"
+                    className="px-6 py-3 border-2 border-[#1A1A1A] bg-[#1A1A1A] text-white rounded-[4px] font-mono font-bold text-xs tracking-widest uppercase hover:bg-white hover:text-[#1A1A1A] transition-colors shadow-[2px_2px_0px_rgba(0,0,0,0.1)] active:translate-y-[1px]"
+                  >
+                    View Drop 01
+                  </a>
+                  <a
+                    href="#grid"
+                    className="px-6 py-3 border-2 border-[#1A1A1A] bg-white text-[#1A1A1A] rounded-[4px] font-mono font-bold text-xs tracking-widest uppercase hover:bg-[#1A1A1A] hover:text-white transition-colors"
+                  >
+                    Catalog
+                  </a>
+                </div>
+              </div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: shouldReduce ? 0 : 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.35, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
-              className="font-sans font-black text-gray-900 leading-tight tracking-tight"
-              style={{ fontSize: 'clamp(42px, 7vw, 88px)' }}
-            >
-              Modular apparel<br />
-              <span className="text-gray-300">for creative systems.</span>
-            </motion.h1>
+            {/* Row 1 Col 4 - Color Module */}
+            <div className="p-6 md:col-span-2 md:row-span-2 flex flex-col justify-between bg-stripe-pattern">
+              <div className="flex justify-between items-start">
+                <span className="text-[10px] font-mono font-bold text-[#1A1A1A] border border-[#1A1A1A] bg-white px-2 py-0.5 rounded-[2px]">
+                  TILE_COORD_04
+                </span>
+                <span className="text-[10px] font-mono text-gray-400">STATUS: ON</span>
+              </div>
+              <div className="w-24 h-24 border-2 border-[#1A1A1A] rounded-[4px] shadow-[4px_4px_0px_#1A1A1A] bg-[#0046AD] self-center my-6" />
+              <div className="text-[10px] font-mono font-bold text-gray-500 uppercase tracking-widest">
+                COBALT BLUE MODULE // EXT 01
+              </div>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: shouldReduce ? 0 : 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.55 }}
-              className="mt-6 text-sm font-mono text-gray-500 tracking-widest uppercase"
-            >
-              Built from motion, color, and controlled chaos.
-            </motion.p>
+            {/* Row 3 Col 4-5 - System telemetry */}
+            <div className="p-6 md:col-span-2 md:row-span-1 border-t-2 border-[#1A1A1A] flex flex-col justify-between bg-[#F9F9F9]">
+              <span className="text-[10px] font-mono font-bold text-[#1A1A1A]">SYSTEMS TELEMETRY</span>
+              <div className="grid grid-cols-2 gap-4 my-2">
+                <div>
+                  <div className="text-[8px] font-mono text-gray-400 uppercase">MATRIX TYPE</div>
+                  <div className="text-xs font-mono font-black text-[#1A1A1A]">5x2 HORIZONTAL</div>
+                </div>
+                <div>
+                  <div className="text-[8px] font-mono text-gray-400 uppercase">LATENCY</div>
+                  <div className="text-xs font-mono font-black text-[#1A1A1A]">0.00 MS (SNAPPED)</div>
+                </div>
+              </div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: shouldReduce ? 0 : 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="mt-10 flex items-center justify-center gap-4"
-            >
-              <a
-                href="#drop"
-                className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-mono font-bold text-sm tracking-widest uppercase hover:bg-gray-700 transition-colors"
-              >
-                View Drop 01
-              </a>
-              <a
-                href="#grid"
-                className="px-8 py-4 bg-white text-gray-600 rounded-2xl font-mono font-bold text-sm tracking-widest uppercase border border-gray-200 hover:border-gray-400 hover:text-gray-900 transition-all"
-              >
-                Full Catalog
-              </a>
-            </motion.div>
+            {/* Row 4 Col 1-5 footer section */}
+            <div className="p-6 md:col-span-5 md:row-span-1 border-t-2 border-[#1A1A1A] grid grid-cols-2 md:grid-cols-5 gap-4 bg-[#1A1A1A] text-white">
+              {HERO_TILES.map((tile, i) => (
+                <div key={i} className="flex items-center gap-3 border border-white/20 p-2 rounded-[2px]">
+                  <div className="w-4 h-4 rounded-[2px] border border-white" style={{ background: tile.color }} />
+                  <span className="text-[10px] font-mono font-bold tracking-wider">{tile.label}</span>
+                </div>
+              ))}
+            </div>
+
           </div>
-
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[10px] font-mono text-gray-400 tracking-[0.25em] uppercase"
-          >
-            <span>Scroll through the drop</span>
-            <motion.div
-              animate={shouldReduce ? {} : { y: [0, 6, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </motion.div>
-          </motion.div>
         </section>
 
         {/* ════════════════════════════════════════

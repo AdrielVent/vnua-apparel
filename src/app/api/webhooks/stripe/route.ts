@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
   // Handle checkout.session.completed
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = event.data.object as any;
 
     const recipient = {
       name: session.shipping_details?.name || 'Customer Name',
@@ -71,4 +71,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ received: true });
 }
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
