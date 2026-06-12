@@ -97,10 +97,10 @@ body {
 /* Subtle vertical stripe pattern (very light) */
 .bg-stripe-pattern {
   background-image: 
-    linear-gradient(to right, #1A1A1A 1px, transparent 1px),
-    linear-gradient(to bottom, #1A1A1A 1px, transparent 1px);
+    linear-gradient(to right, #E5E5E5 1px, transparent 1px),
+    linear-gradient(to bottom, #E5E5E5 1px, transparent 1px);
   background-size: 40px 40px;
-  background-color: #FAFAFA;
+  background-color: #FCFCFC;
 }
 
 /* Soft panel card */

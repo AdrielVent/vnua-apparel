@@ -3,10 +3,11 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ClothingProduct } from '@/data/clothingProducts';
 
-// 5x2 horizontal split-pane grid colors
+// 3x3 puzzle-cube style colors
 const GRID_COLORS = [
-  '#D00000', '#0046AD', '#FFD500', '#009B48', '#FF5800',
-  '#0046AD', '#D00000', '#009B48', '#FF5800', '#FFD500',
+  '#D00000', '#0046AD', '#FFD500',
+  '#009B48', '#FF5800', '#D00000',
+  '#0046AD', '#FFD500', '#009B48',
 ];
 
 interface AssemblingCubeGridProps {
@@ -42,8 +43,8 @@ export function AssemblingCubeGrid({ products, gridRef }: AssemblingCubeGridProp
         </h2>
       </motion.div>
 
-      {/* 5×2 split-pane assembly matrix */}
-      <div className="grid grid-cols-5 gap-3 p-3 bg-white border-2 border-[#1A1A1A] rounded-[4px] shadow-[8px_8px_0px_#1A1A1A] w-full max-w-[500px] md:max-w-[640px]">
+      {/* 3x3 single assembly matrix */}
+      <div className="grid grid-cols-3 gap-3 p-3 bg-white border-2 border-[#1A1A1A] rounded-[4px] shadow-[8px_8px_0px_#1A1A1A] w-[240px] md:w-[300px]">
         {GRID_COLORS.map((color, i) => {
           const product = products[i % products.length];
           return (
