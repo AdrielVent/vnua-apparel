@@ -1,33 +1,9 @@
 {
-  "name": "engineered-apparel",
-  "version": "0.1.0",
+  "name": "vnua-apparel",
   "private": true,
+  "version": "1.0.0",
+  "description": "Vnua Apparel site: plain HTML in site/, copied to out/ for GitHub Pages.",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "@stripe/stripe-js": "^9.7.0",
-    "framer-motion": "^12.40.0",
-    "lucide-react": "^1.17.0",
-    "mongoose": "^9.6.3",
-    "next": "16.2.7",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "stripe": "^22.2.0",
-    "zustand": "^5.0.14"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/estree": "^1.0.9",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.7",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "build": "node scripts/build.mjs"
   }
 }
