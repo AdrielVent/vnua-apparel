@@ -17,7 +17,7 @@ By hand: everything you see is in `content/`.
 | `content/products.json` | Every piece: name, section, color, status, price, sketch or photo |
 | `content/pages/*.json` | Store, Club Merch, Drop 01, About, Contact, 404 text |
 | `content/site.json` | Name at the top, menu, footer |
-| `site/assets/` | Stylesheet, fonts (Barlow, Cousine; SIL Open Font License) and uploaded images |
+| `site/assets/` | Stylesheet, Barlow font (SIL Open Font License), light/dark script and uploaded images |
 
 ## Building
 
