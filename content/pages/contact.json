@@ -1,0 +1,5 @@
+{
+  "title": "Contact",
+  "lead": "Email is the best way to reach me, whether it's about club merch or Drop 01.",
+  "body": "<table>\n<tr><th>Email</th><td><a href=\"mailto:adriel@adrielv.me\">adriel@adrielv.me</a></td></tr>\n<tr><th>Club merch</th><td><a href=\"mailto:adriel@adrielv.me?subject=Club%20merch&body=Hi%20Adriel%2C%0A%0AClub%20(SHPE%20or%20AIAA)%3A%20%0AWhich%20piece%3A%20%0ASize%3A%20%0A\">Tell me what you'd order</a></td></tr>\n<tr><th>Company</th><td><a href=\"https://adrielvent.github.io/vnua-systems/\">Vnua Systems</a></td></tr>\n</table>"
+}

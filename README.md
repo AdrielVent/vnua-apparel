@@ -2,23 +2,27 @@
 
 https://adrielvent.github.io/vnua-apparel/
 
-The Vnua Industries store: club drops for Hofstra SHPE and Hofstra AIAA, and Drop 01. Nothing is for sale yet.
-Club drops are concepts for a member vote; each club runs its own preorder campaign and keeps the money.
-Drop 01 is designed but not made, so the site shows flat sketches (inline SVG) instead of photos.
+The Vnua Industries store: club merch for Hofstra SHPE and Hofstra AIAA, and Drop 01. Nothing is for sale yet.
+Club merch pieces are concepts for a member vote; each club runs its own preorder and keeps the money.
 
-Plain HTML in `site/`. On every push to `main`, `.github/workflows/deploy.yml` runs `npm ci && npm run build`,
-which only copies `site/` to `out/` (no dependencies), and publishes `out/` to GitHub Pages.
+## Editing
 
-| Page | What's on it |
+The easy way: go to https://app.pagescms.org, sign in with GitHub, and open `AdrielVent/vnua-apparel`.
+You get forms for products, page text, the menu and the footer. Saving commits to `main` and the site rebuilds.
+
+By hand: everything you see is in `content/`.
+
+| File | What's in it |
 | --- | --- |
-| `site/index.html` | Home: club drops and four Drop 01 pieces |
-| `site/club-drops.html` | SHPE and AIAA concepts, the approval and preorder steps, sources |
-| `site/drop-01.html` | All six pieces |
-| `site/about.html`, `site/contact.html` | About and contact |
-| `site/404.html` | Not-found page |
+| `content/products.json` | Every piece: name, section, color, status, price, sketch or photo |
+| `content/pages/*.json` | Store, Club Merch, Drop 01, About, Contact, 404 text |
+| `content/site.json` | Name at the top, menu, footer |
+| `site/assets/` | Stylesheet, fonts (Barlow, Cousine; SIL Open Font License) and uploaded images |
 
-Same stylesheet and type as the hub (https://adrielvent.github.io/vnua-systems/): Oswald, Source Sans 3 and Cousine,
-served from `site/assets/fonts/` under the SIL Open Font License.
+## Building
 
-The previous Next.js store (cart, Stripe and Printful stubs) is in this repo's history before the
-"Rebuild as a plain site" commit, and on the `archive/next-store` branch.
+`npm run build` runs `scripts/build.mjs` (no dependencies), which writes the whole site to `out/`. On every push to
+`main`, `.github/workflows/deploy.yml` runs `npm ci && npm run build` and publishes `out/` to GitHub Pages.
+Each product gets its own page at `<slug>.html`.
+
+The previous Next.js store is on the `archive/next-store` branch.

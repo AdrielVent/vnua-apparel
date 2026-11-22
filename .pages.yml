@@ -1,0 +1,57 @@
+# Pages CMS: edit the store at https://app.pagescms.org (sign in with GitHub, open AdrielVent/vnua-apparel).
+# Saving there commits to main; the GitHub Pages workflow rebuilds the store in a minute or two.
+media:
+  input: site/assets/img
+  output: assets/img
+
+content:
+  - name: products
+    label: Products
+    type: file
+    path: content/products.json
+    format: json
+    list: true
+    fields:
+      - { name: name, label: Name, type: string, required: true }
+      - { name: slug, label: "Page address (lowercase-with-dashes, no .html)", type: string, required: true }
+      - { name: group, label: Section, type: select, options: { values: [Club merch, Drop 01] } }
+      - { name: club, label: "Club (club merch only)", type: string }
+      - { name: text, label: Description, type: text }
+      - { name: color, label: Color, type: string }
+      - { name: swatch, label: "Color swatch (hex, like #1d2c4c)", type: string }
+      - { name: status, label: Status, type: string }
+      - { name: price, label: Price, type: string }
+      - { name: image, label: "Photo (once it's made; replaces the sketch)", type: image }
+      - { name: sketch, label: "Sketch, front (SVG code)", type: code, options: { format: html } }
+      - { name: sketch_back, label: "Sketch, back (SVG code, optional)", type: code, options: { format: html } }
+
+  - name: pages
+    label: Pages
+    type: collection
+    path: content/pages
+    format: json
+    view:
+      fields: [title]
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: lead, label: Intro line, type: text }
+      - { name: body, label: Page text, type: rich-text }
+
+  - name: site
+    label: Name, menu and footer
+    type: file
+    path: content/site.json
+    format: json
+    fields:
+      - { name: name_bold, label: "Name (bold part)", type: string }
+      - { name: name_light, label: "Name (light part)", type: string }
+      - { name: tagline, label: Line under the name, type: string }
+      - name: menu
+        label: Menu
+        type: object
+        list: true
+        fields:
+          - { name: label, label: Label, type: string }
+          - { name: url, label: Link, type: string }
+      - { name: footer_note, label: Footer line, type: string }
+      - { name: footer_small, label: Footer small print, type: string }

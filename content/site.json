@@ -1,0 +1,33 @@
+{
+  "name_bold": "Vnua",
+  "name_light": "Apparel",
+  "tagline": "Club merch · Drop 01",
+  "menu": [
+    {
+      "label": "Store",
+      "url": "index.html"
+    },
+    {
+      "label": "Club Merch",
+      "url": "club-merch.html"
+    },
+    {
+      "label": "Drop 01",
+      "url": "drop-01.html"
+    },
+    {
+      "label": "About",
+      "url": "about.html"
+    },
+    {
+      "label": "Contact",
+      "url": "contact.html"
+    },
+    {
+      "label": "Vnua Systems",
+      "url": "https://adrielvent.github.io/vnua-systems/"
+    }
+  ],
+  "footer_note": "© 2026 Vnua Industries · Hempstead, New York",
+  "footer_small": "Vnua Apparel isn't affiliated with or endorsed by Hofstra University, SHPE or AIAA."
+}
