@@ -28,6 +28,7 @@ function layout(file, title, description, body, current) {
 <title>${esc(title === 'Store' ? 'Vnua Apparel' : `${title} | Vnua Apparel`)}</title>
 <meta name="description" content="${esc(description)}">
 <meta name="theme-color" content="#f4f4f4">
+<script>(function(){var t;try{t=localStorage.getItem('vnua-theme')}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)})();</script>
 <link rel="icon" type="image/svg+xml" href="${favicon}">
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website">
@@ -40,6 +41,7 @@ function layout(file, title, description, body, current) {
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
 <header class="masthead">
+  <button class="theme-toggle" type="button" hidden aria-label="Switch to dark mode"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg><span class="label">Dark</span></button>
   <a class="wordmark" href="./">
     <span class="name"><b>${esc(site.name_bold)}</b> <span>${esc(site.name_light)}</span></span>
     <span class="rule"></span>
@@ -61,6 +63,7 @@ ${body}
     <p>${esc(site.footer_small)}</p>
   </div>
 </footer>
+<script src="assets/theme.js"></script>
 </body>
 </html>
 `);
